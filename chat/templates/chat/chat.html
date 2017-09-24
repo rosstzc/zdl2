@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>这是首页</title>
+    <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
+    <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://unpkg.com/vue"></script>
+
+
+</head>
+
+<body>
+
+
+    <div class="container" id="app">
+      <h3 class="text-center">这是首页</h3>
+{#        [[ message ]]#}
+    </div>
+      <h3 class="text-center">自己信息</h3>
+    <div>用户名：{{ my.name }}</div>
+    <div>状态：{{ my.state }}</div>
+    <div>可用积分：{{ my.score_today }}</div>
+
+    {% if state == '3'  %}
+      <h3 class="text-center">对方用户(如果有)</h3>
+    <div>用户id：{{ user_chat.id }}</div>
+    <div>用户呢称：{{ user_chat.name }}</div>
+    <div>性别：{{ user_chat.sex }}</div>
+            <div>状态：{{ user_chat.state }}</div>
+    <div>个人简介：{{ user_chat.introdution}}</div>
+    <div>头像url：{{ user_chat.image_url }}</div>
+    {% endif %}
+
+    {% if state == '2' %}
+    <form class="" action="" method="get" enctype="multipart/form-data">
+        {% csrf_token %}
+    <div class="container" id="pp">
+
+        <div class="weui-btn-area">
+            <input type="submit" value="登录" class="weui-btn weui-btn_primary">
+        </div>
+    </div>
+    </form>
+    {% endif %}
+<!--
+<script type="text/javascript">
+    const vm = new Vue({
+    delimiters: ['[[', ']]'],
+  el: '#app',
+  data: {
+    message: "ttttttttt"
+  }
+});
+</script>
+-->
+    <script src="../js/app.js"></script>
+
+</body>
+</html>
+
+
