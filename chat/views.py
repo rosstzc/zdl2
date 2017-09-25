@@ -126,18 +126,22 @@ def index(req):
                     user_chat.save()
                     response = HttpResponseRedirect(reverse('index'))
                 else:
-                    return HttpResponse('all is busy')
+                    return HttpResponse('all is busy') #todoo 前端要效果
+
 
         #退出聊天
         if action == 'leave':
             if my.state == '3':
                 chat = Chat.objects.select_related().filter(Q(rid=uid) | Q(sid=uid), close='0')
                 user_chat = GetUserChat(chat[0],uid)
-                my.state = '2'
+                my.state = '1'
                 my.save()
-                user_chat.state = '2'
+                user_chat.state = '1'
                 user_chat.save()
                 chat.update(close='1') #一般只有1个，考虑到容错，就全部更新
+            if my.state == '2':
+                my.state = '1'
+                my.save()
             response = HttpResponseRedirect(reverse('index'))
             return response
 
@@ -154,9 +158,12 @@ def index(req):
             return response
 
 
-        content = {'my': my, 'state':my.state}
+        url_gochat = GetSiteUrl(req) + '?action=gochat'
+        content = {'my': my, 'state':my.state, 'url_gochat':url_gochat}
         response = render(req, 'chat/chat.html', content)
         return response
+
+
 
     # #todoo，
     #  1） 用户发起配对时，修改state和记录触发时间（30s有效）。
@@ -242,7 +249,9 @@ class Login(View):
             response = HttpResponseRedirect(reverse('index'))
             # response.set_cookie('wname', user.get('wname'), max_age=10000000000)
             response.set_cookie('UID', uid, max_age=10000000000)
-            # response.set_cookie('name', user.get('name'), max_age=10000000000)
+            response.set_cookie('name', user.get('name'), max_age=10000000000)
+            response.set_cookie('info', user.get('introdution'), max_age=10000000000)
+            response.set_cookie('image_url', user.get('image_url'), max_age=10000000000)
             return response
         else:
             return  HttpResponse("用户名或密码错误")
@@ -259,8 +268,11 @@ class Login(View):
     #                               RequestContext(req, {}))
 
 
-
+#类似与以前的inbox，
 def chatList(req):
+
+    #todoo，以前是每次发信都要刷新inbox表，比较浪费资源。。修改为当打开该页面时，现刷新写入list表
+
     context = {'user': ''}
     response = render(req, 'message/chat_list.html', context)
     return response
@@ -278,17 +290,26 @@ def message(req,uid):
 
 
 def userProfile(req,uid):
+    user = User.objects.get(id=uid)
+    my_uid = req.COOKIES.get('UID')
+    myself = '0' #不是本人
+    if my_uid == uid:
+        myself = '1'
+        url_modify_info = GetSiteUrl(req) + 'modify-info'
+        context = {'user': user,'myself':myself, 'url':url_modify_info}
+        response = render(req, 'user/info.html', context)
+        return response
 
-    #参考 口语桥 profile方法
-    #根据objectId查询该用户信息并且展示； 如果是自己有修改按钮修改资料
+    context = {'user': user}
+    response = render(req, 'user/info.html', context)
+    return response
 
-    #封装获某用户资料方法，其他地方会用到
-
-    return
 
 def my(req):
-
-    context = {'user': ''}
+    uid = req.COOKIES.get('UID')
+    my = User.objects.get(id=uid)
+    url_info = GetSiteUrl(req) + '/user/' + uid
+    context = {'my': my, 'url_info':url_info}
     response = render(req, 'user/my.html', context)
     return response
 
@@ -296,21 +317,27 @@ def my(req):
 class ModifyInfo(View):
 
     def post(self,req):
-        return
+        uid = req.COOKIES.get('UID')
+        my = User.objects.get(id=uid)
+        name = req.POST.get('name')
+        #todoo
+        my.name = name
+        my.save()
+        url = GetSiteUrl(req) + 'user/' + uid
+        response = HttpResponseRedirect(url)
+        return response
+
+
     def get(self,req):
-        user = leancloud.User.get_current()
+        uid = req.COOKIES.get('UID')
+        my = User.objects.get(id=uid)
         content = {
-            user: user.get('name'),
-            # gender
-            # age
-
+            'user': my,
         }
-
         #前端更换图片，异步调用updatePhoto把图片保存到数据库
-
-
         response = render(req, 'user/modify_info.html',content)
-        return
+        return response
+
 
 
 #查询在线用户
