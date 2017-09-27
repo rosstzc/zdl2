@@ -2,9 +2,66 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>快聊</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>与某人消息列表</title>
+    <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
+    <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://unpkg.com/vue"></script>
+
+
 </head>
+
 <body>
-<h1>dfd水电费</h1>
+
+
+    <div class="container" id="app">
+      <h3 class="text-center">与某人消息列表</h3>
+
+        {% for i in msgs %}
+            <div>发送者名称：{{ i.sid.name }}</div>
+            <div> | 聊天内容：{{ i.content }}</div>
+            <div> | 接受者名称：{{ i.rid.name }}</div>
+            <div>---------------</div>
+        {% endfor %}
+    </div>
+
+    <form class="" action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+    <div class="container" id="pp">
+
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label" >输入内容：</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text" name="msg"  placeholder="请输入内容"/>
+                </div>
+            </div>
+
+        </div>
+        <div class="weui-btn-area">
+            <input type="submit" value="发送" class="weui-btn weui-btn_primary">
+
+{#            <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips" type="sumit">确定</a>#}
+        </div>
+    </div>
+
+</form>
+<!--
+<script type="text/javascript">
+    const vm = new Vue({
+    delimiters: ['[[', ']]'],
+  el: '#app',
+  data: {
+    message: "ttttttttt"
+  }
+});
+</script>
+-->
+    <script src="../js/app.js"></script>
+
 </body>
 </html>
+
+

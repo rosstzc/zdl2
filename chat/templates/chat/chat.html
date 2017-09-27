@@ -13,7 +13,7 @@
 
 </head>
 
-<body> 
+<body>
 
 
     <div class="container" id="app">
@@ -35,16 +35,14 @@
     <div>头像url：{{ user_chat.image_url }}</div>
     {% endif %}
 
-    {% if state == '2' %}
-    <form class="" action="" method="get" enctype="multipart/form-data">
-        {% csrf_token %}
-    <div class="container" id="pp">
+    {% if state == '1' %}
+        <div>| <a href="{{ url_gochat }}">随机匹配</a>  </div>
+    {% elif state == '2' %}
+        <div>| <a href="{{ url_gochat }}">匹配中，重新再触发</a>  </div>
+        <div>  | <a href="{{ url_leave }}">离开</a> </div>
+    {% else %}
+        <div>  | <a href="{{ url_leave }}">离开</a> </div>
 
-        <div class="weui-btn-area">
-            <input type="submit" value="登录" class="weui-btn weui-btn_primary">
-        </div>
-    </div>
-    </form>
     {% endif %}
 <!--
 <script type="text/javascript">

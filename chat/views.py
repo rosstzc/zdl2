@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest, QueryDict
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseServerError
 from django.urls import reverse
@@ -112,6 +112,9 @@ def index(req):
                 response = HttpResponseRedirect(reverse('index'))
                 return response
             else:
+                my.state = '2'
+                my.save()
+
                 #到user表找 匹配中的人； todoo 写入一个最近匹配时间，这样就不用一个自动脚本来刷新用户状态
                 user = User.objects.filter(state='2').exclude(id=uid)
                 if user.count() > 0:
@@ -146,20 +149,23 @@ def index(req):
             return response
 
 
-        #如果状态是"聊天中"，要获取对方资料; select_related表示外键关联查询
+        #如果状态是"聊天中"，
+        user_chat = ''
         if my.state == '3':
             chat = Chat.objects.select_related().filter(Q(rid=uid) | Q(sid=uid), close='0')
             user_chat = ''
             if chat.count() > 0:
                 user_chat = GetUserChat(chat[0],uid)
 
-            content = {'my': my, 'user_chat':user_chat, 'state':'3'}
-            response = render(req, 'chat/chat.html', content)
-            return response
+            # content = {'my': my, 'user_chat':user_chat, 'state':'3'}
+            # response = render(req, 'chat/chat.html', content)
+            # return response
 
 
         url_gochat = GetSiteUrl(req) + '?action=gochat'
-        content = {'my': my, 'state':my.state, 'url_gochat':url_gochat}
+        url_leave = GetSiteUrl(req) + '?action=leave'
+        test = my.state
+        content = {'my': my, 'user_chat':user_chat, 'state':my.state, 'url_gochat':url_gochat, 'url_leave':url_leave}
         response = render(req, 'chat/chat.html', content)
         return response
 
@@ -268,25 +274,68 @@ class Login(View):
     #                               RequestContext(req, {}))
 
 
-#类似与以前的inbox，
+#类似与以前的showInbox，
 def chatList(req):
+    uid = req.COOKIES.get('UID')
+    #todoo 以前是每次发信都要刷新inbox表，比较浪费资源。。优化：访问该页时才刷新最近那一条对话信息 （还是不行，要循环50次）
 
-    #todoo，以前是每次发信都要刷新inbox表，比较浪费资源。。修改为当打开该页面时，现刷新写入list表
-
-    context = {'user': ''}
+    result = ChatList.objects.select_related().filter(rid=uid).order_by('-time')[:50]
+    context = {'chatList': result}
     response = render(req, 'message/chat_list.html', context)
     return response
 
 
-def message(req,uid):
+#与某人的消息记录列表
+def showMessage(req,rid):
+    uid = req.COOKIES.get('UID')
 
     if req.method == 'POST':
-        #发送信息，日后采用异步实现
-        return
+        if uid == rid:
+            return HttpResponse('can not send message to useself')
+        #todoo发送信息，日后采用异步实现
 
-    context = {'user': ''}
+        msg = req.POST.get('msg')
+        saveMessage(req, uid, rid, msg)
+        url_full = HttpRequest.build_absolute_uri(req)
+        return HttpResponseRedirect(url_full)
+
+    else:
+        #对方名字
+        userbName = User.objects.get(id=rid).name
+        userbUrl = GetUserUrl(req, rid)
+        result = Message.objects.select_related().filter(Q(sid_id=uid, rid_id=rid) | Q(sid_id=rid,rid_id=uid))
+
+    context = {'msgs': result,
+               'name':userbName,
+               'url':userbUrl
+               }
     response = render(req, 'message/message.html', context)
     return response
+
+
+
+#保存信息
+def saveMessage(req, sid, rid, msg):
+    message = Message(sid_id=sid,
+                      rid_id=rid,
+                      content=msg,
+                      s_time=GetTimeNow())
+    message.save()
+
+   #统计对方未读信息
+    unread = Message.objects.filter(sid_id=sid, rid_id=rid, read_not=0).count()
+
+    #在ChatList是保存两人之间的最新的对话，在数据库保留写入两条记录，a-b,b-a,但实际上只从第二个字段进行查找
+    # 所以先删除旧的，再插入新的
+    result = ChatList.objects.filter(Q(sid_id=sid, rid_id=rid) | Q(sid=rid, rid=sid))
+    if result.count() >= 1:
+        result.delete()
+
+    chat = ChatList(sid_id=sid, rid_id=rid, unread=unread, content=msg, time=GetTimeNow())
+    chat.save()
+    #反过来再插入一条
+    chat = ChatList(sid_id=rid, rid_id=sid, unread=unread, content=msg, time=GetTimeNow())
+    chat.save()
 
 
 def userProfile(req,uid):
@@ -308,36 +357,35 @@ def userProfile(req,uid):
 def my(req):
     uid = req.COOKIES.get('UID')
     my = User.objects.get(id=uid)
-    url_info = GetSiteUrl(req) + '/user/' + uid
+    url_info = GetSiteUrl(req) + 'user/' + uid
     context = {'my': my, 'url_info':url_info}
     response = render(req, 'user/my.html', context)
     return response
 
 
 class ModifyInfo(View):
-
     def post(self,req):
         uid = req.COOKIES.get('UID')
         my = User.objects.get(id=uid)
         name = req.POST.get('name')
+        imagae1 = req.FILES['image1']
         #todoo
         my.name = name
+        my.image1 = imagae1
         my.save()
         url = GetSiteUrl(req) + 'user/' + uid
         response = HttpResponseRedirect(url)
         return response
 
-
     def get(self,req):
         uid = req.COOKIES.get('UID')
         my = User.objects.get(id=uid)
         content = {
-            'user': my,
+            'my': my,
         }
         #前端更换图片，异步调用updatePhoto把图片保存到数据库
         response = render(req, 'user/modify_info.html',content)
         return response
-
 
 
 #查询在线用户

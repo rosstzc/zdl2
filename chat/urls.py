@@ -1,5 +1,6 @@
 from django.conf.urls import  url
-
+from django.conf import settings
+from django.conf.urls.static import static
 
 from chat import views
 
@@ -19,7 +20,7 @@ urlpatterns = [
 
     #message
     url(r'^chat-list/$', views.chatList, name='chatList'),
-    url(r'^message/(?P<uid>.{1,50})/$', views.message, name='message'),
+    url(r'^message/(?P<rid>.{1,50})/$', views.showMessage, name='showMessage'),
 
     #manage
     url(r'^manage/login$', views.manageLogin, name=''),
@@ -58,7 +59,11 @@ urlpatterns = [
 
     #
 
-]
+]  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+
+
 
 
 # from lru import views

@@ -47,7 +47,7 @@ MANAGERS = ADMINS
 SECRET_KEY = 'i6m5^6xdt9bmn=zh2v8jwjz(donw)b(zo8p@a6evbp7(%r@-zf'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
 
 ALLOWED_HOSTS = []
 
@@ -179,6 +179,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\','/')
+MEDIA_URL = '/media/'
+
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')

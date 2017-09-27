@@ -64,7 +64,8 @@ class User(models.Model):
     #image0, image1, image2...
     image_url = models.TextField(blank=True,) #用json呈现
     gift =  models.TextField(blank=True,)
-
+    image1 = models.FileField(upload_to='fig/', blank=True)
+    # image1 = models.FileField(upload_to='../media/fig/', blank=True)
 
     # IMG = models.FileField(upload_to='../media/fig/', verbose_name='* 上传头像 /Photo', blank=True,
     #                        help_text='提示：1）有照片的人会获得更多交流机会. 2）严禁情色、暴力、政治等违反中国法规的图片，一经发现直接封ID。3)暂不支持gif图片和大尺寸图片，会出错哦，亲 ')
@@ -163,6 +164,8 @@ class Like(models.Model):
 class Give(models.Model):
     w_name = models.CharField(max_length=50, verbose_name='* W_NAME', blank=True)
 
+
+#配对记录表
 class Chat(models.Model):
     sid = models.ForeignKey(User, related_name='chat_sid',null=True)
     rid = models.ForeignKey(User,related_name='chat_rid',null=True)
@@ -172,8 +175,30 @@ class Chat(models.Model):
     hidden =  models.CharField(max_length=5,default=0,blank=True)
     msg_count = models.CharField(max_length=10,default=0,blank=True)
 
+
+#消息列表
 class Message(models.Model):
-    w_name = models.CharField(max_length=50, verbose_name='* W_NAME', blank=True)
+    sid = models.ForeignKey(User,related_name='sid_message',null=True) #发送者id
+    rid = models.ForeignKey(User, related_name='rid_message',null=True)  #接受者id
+    read_not = models.CharField(max_length=2, default='0')  #接收方是否看了   1看了， 0为看
+    content= models.TextField(blank=True)  #私信内容
+    img = models.TextField(blank=True)    #附件图片 （日后拓展）
+    s_time = models.CharField(max_length=50, blank=True)
+    r_time = models.CharField(max_length=50, blank=True)  #阅读时间	      与readnot字段一同刷新
+    s_del = models.CharField(max_length=20, blank=True)  #发送方删除      1删除，0未删除，
+    r_del = models.CharField(max_length=20, blank=True )  #接收方删除      1删除，0未删除
+
 
 class Interest(models.Model):
     w_name = models.CharField(max_length=50, verbose_name='* W_NAME', blank=True)
+
+
+#聊天记录表
+class ChatList(models.Model):
+    sid = models.ForeignKey(User,related_name='_sid_chat_list',null=True) #发送者id
+    rid = models.ForeignKey(User, related_name='rid_chat_list',null=True)  #接受者id
+    content = models.TextField(blank=True)
+    img = models.TextField(blank=True)
+    time = models.CharField(max_length=50,blank=True)
+    m_type =models.CharField(max_length=2, default='1') # 信息类型，默认为1：私信
+    unread = models.SmallIntegerField(default=0,blank=True)

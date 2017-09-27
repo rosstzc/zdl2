@@ -18,6 +18,11 @@ def GetSiteUrl(req):
     return site_url
 
 
+def GetUserUrl(req, uid):
+    url = get_current_site(req)
+    user_url = 'http://' + url.domain + '/user/' + str(uid) + '/'
+    return user_url
+
 
 #分页，req是get请求，result是查询结果，row是每页的行数，paginator是官方方法
 def Paging(req, result, row):

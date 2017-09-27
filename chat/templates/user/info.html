@@ -2,9 +2,17 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>快聊</title>
+    <title>个人资料页</title>
 </head>
 <body>
-<h1>dfd水电费</h1>
+<h1>个人资料</h1>
+
+    <div>用户名：{{ user.name }}</div>
+    <div>状态：{{ user.state }}</div>
+    <div>可用积分：{{ user.score_today }}</div>
+
+    {% if myself == '1' %}
+        <div><a href="{{ url }}">修改资料</a></div>
+    {% endif %}
 </body>
 </html>

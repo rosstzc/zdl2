@@ -2,9 +2,45 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>快聊</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>聊天列表</title>
+    <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
+    <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://unpkg.com/vue"></script>
+
+
 </head>
+
 <body>
-<h1>dfd水电费</h1>
+
+
+    <div class="container" id="app">
+      <h3 class="text-center">聊天列表</h3>
+
+        {% for i in chatList %}
+            <div>用户名：{{ i.sid.name }}</div>
+            <div>最近一条聊天记录：{{ i.content }}</div>
+            <div>时间：{{ i.time }}</div>
+            <div>---------------</div>
+        {% endfor %}
+    </div>
+
+<!--
+<script type="text/javascript">
+    const vm = new Vue({
+    delimiters: ['[[', ']]'],
+  el: '#app',
+  data: {
+    message: "ttttttttt"
+  }
+});
+</script>
+-->
+    <script src="../js/app.js"></script>
+
 </body>
 </html>
+
+
