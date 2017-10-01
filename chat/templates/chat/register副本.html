@@ -1,67 +1,102 @@
 <!DOCTYPE html>
-<html lang="zh-cmn-Hans">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
-    <title>注册</title>
+    <title>这是首页</title>
     <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
     <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
 
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <script src="https://unpkg.com/vue"></script>
 
-
+    <style type="text/css">
+        .weui_tabbar {
+            position: fixed;
+        }
+    </style>
 </head>
 
 <body>
 
 
+<div class="container" id="app">
 
 
-    <div>222</div>
 
-    <div class="container" id="app">
-      <h3 class="text-center">VueNews</h3>
+
+
+      <h3 class="text-center">这是首页</h3>
 {#        [[ message ]]#}
-    </div>
+      <h3 class="text-center">自己信息</h3>
+        <div>用户id：{{ my.id }}</div>
+    <div>用户名：{{ my.name }}</div>
+    <div>状态：{{ my.state }}</div>
+    <div>可用积分：{{ my.score_today }}</div>
+
+    {% if state == '3'  %}
+      <h3 class="text-center">对方用户(如果有)</h3>
+    <div>用户id：{{ user_chat.id }}</div>
+    <div>用户呢称：{{ user_chat.name }}</div>
+    <div>性别：{{ user_chat.sex }}</div>
+            <div>状态：{{ user_chat.state }}</div>
+    <div>个人简介：{{ user_chat.introdution}}</div>
+    <div>头像url：{{ user_chat.image_url }}</div>
+    {% endif %}
+
+    {% if state == '1' %}
+        <div>| <a href="{{ url_gochat }}">随机匹配</a>  </div>
+    {% elif state == '2' %}
+        <div>| <a href="{{ url_gochat }}">匹配中，重新再触发</a>  </div>
+        <div>  | <a href="{{ url_leave }}">离开</a> </div>
+    {% else %}
+        <div>  | <a href="{{ url_leave }}">离开</a> </div>
+
+    {% endif %}
 
 
 
-    <div class="container" id="pp">
 
-        <div class="weui-cells weui-cells_form">
-            <div class="weui-cell">
-                <div class="weui-cell__hd"><label class="weui-label">用户名</label></div>
-                <div class="weui-cell__bd">
-                    <input class="weui-input" type="text"  placeholder="请输入用户名"/>
-                </div>
-            </div>
-            <div class="weui-cell">
-                <div class="weui-cell__hd"><label class="weui-label">密码</label></div>
-                <div class="weui-cell__bd">
-                    <input class="weui-input" type="text"  placeholder="请输入密码"/>
-                </div>
-            </div>
-            <div class="weui-btn-area">
-            <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">确定</a>
-            </div>
+    <div class="weui-tab">
+        <div class="weui-tab__panel">
+
+        </div>
+        <div class="weui-tabbar">
+            <a href="javascript:;" class="weui-tabbar__item weui-bar__item_on">
+                <img src="./images/icon_tabbar.png" alt="" class="weui-tabbar__icon">
+                <p class="weui-tabbar__label">微信</p>
+            </a>
+            <a href="javascript:;" class="weui-tabbar__item">
+                <img src="./images/icon_tabbar.png" alt="" class="weui-tabbar__icon">
+                <p class="weui-tabbar__label">通讯录</p>
+            </a>
+            <a href="javascript:;" class="weui-tabbar__item">
+                <img src="./images/icon_tabbar.png" alt="" class="weui-tabbar__icon">
+                <p class="weui-tabbar__label">发现</p>
+            </a>
+            <a href="javascript:;" class="weui-tabbar__item">
+                <img src="./images/icon_tabbar.png" alt="" class="weui-tabbar__icon">
+                <p class="weui-tabbar__label">我</p>
+            </a>
         </div>
     </div>
 
 
 
+</div>
 
-<!--
-<script type="text/javascript">
-    const vm = new Vue({
-    delimiters: ['[[', ']]'],
-  el: '#app',
-  data: {
-    message: "ttttttttt"
-  }
-});
-</script>
--->
+
+
+
+
+
+
+
+
+
+
+
+
     <script src="../js/app.js"></script>
 
 </body>

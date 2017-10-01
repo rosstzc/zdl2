@@ -1,18 +1,43 @@
+
+
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>个人资料页</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>{{ user.name }}</title>
+    <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
+    <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
+
+{#    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>#}
+{#        <script src="https://unpkg.com/vue"></script>#}
+
+
 </head>
+
 <body>
-<h1>个人资料</h1>
 
-    <div>用户名：{{ user.name }}</div>
-    <div>状态：{{ user.state }}</div>
-    <div>可用积分：{{ user.score_today }}</div>
 
-    {% if myself == '1' %}
-        <div><a href="{{ url }}">修改资料</a></div>
-    {% endif %}
+
+
+
+    <div class="container" id="app">
+          <h3 class="text-center">{{ user.name }}</h3>
+        <div>用户名：{{ user.name }}</div>
+        <div>状态：{{ user.state }}</div>
+        <div>可用积分：{{ user.score_today }}</div>
+
+        {% if myself == '1' %}
+            <div><a href="{{ url }}">修改资料</a></div>
+        {% endif %}
+    </div>
+
+
+
+    <script src="../js/app.js"></script>
+
 </body>
 </html>
+
+

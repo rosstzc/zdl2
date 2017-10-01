@@ -33,11 +33,11 @@ class User(models.Model):
     name = models.CharField(max_length=50, verbose_name='' , blank=True)
 
     sex_choices = (
-        ('0', '男'),
-        ('1', '女'),
+        ('0', '女'),
+        ('1', '男'),
         ('2', '其他'),
     )
-    sex = models.CharField(max_length=10, choices=sex_choices, default=3, verbose_name='* 性别 /Sex', blank=True)
+    sex = models.CharField(max_length=10, choices=sex_choices, default='3', verbose_name='* 性别 /Sex', blank=True)
 
     age_choices = (
         ('1', '12~18'),

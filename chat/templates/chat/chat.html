@@ -3,26 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
-    <title>这是首页</title>
+    <title>快聊</title>
     <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
     <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js
+"></script>
 
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-        <script src="https://unpkg.com/vue"></script>
+    {##}
+{#    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>#}
+{#        <script src="https://unpkg.com/vue"></script>#}
+
+    <style type="text/css">
+        .weui_tabbar {
+            position: fixed;
+        }
+    </style>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            {# 检测cookie，来确定是否匹配异性 #}
+            check = $('#s11');
+            temp = $.cookie('sex_match');
+            if (temp==='0') {
+                check.attr('checked',false);
+{#                alert('不匹配异性');#}
+            }
+             check.click(function() {
+                if ($(this).is(":checked")) {
+                    $.cookie('sex_match', '1', { expires: 365 });  {# 匹配异性 #}
+{#                    alert($.cookie('sex_match'))#}
+
+                }else{
+                    $.cookie('sex_match', '0', { expires: 365 });  {# 随便 #}
+{#                    alert($.cookie('sex_match'))#}
+                }
+             });
+
+        })
+    </script>
 
 
 </head>
 
 <body>
 
-
-    <div class="container" id="app">
       <h3 class="text-center">这是首页</h3>
 {#        [[ message ]]#}
-    </div>
       <h3 class="text-center">自己信息</h3>
+        <div>用户id：{{ my.id }}</div>
     <div>用户名：{{ my.name }}</div>
     <div>状态：{{ my.state }}</div>
+    <div>性别：{{ my.sex }}</div>
     <div>可用积分：{{ my.score_today }}</div>
 
     {% if state == '3'  %}
@@ -35,27 +67,72 @@
     <div>头像url：{{ user_chat.image_url }}</div>
     {% endif %}
 
-    {% if state == '1' %}
-        <div>| <a href="{{ url_gochat }}">随机匹配</a>  </div>
-    {% elif state == '2' %}
-        <div>| <a href="{{ url_gochat }}">匹配中，重新再触发</a>  </div>
-        <div>  | <a href="{{ url_leave }}">离开</a> </div>
-    {% else %}
-        <div>  | <a href="{{ url_leave }}">离开</a> </div>
+    {% if state == '1' %}   {# 空闲中 #}
+        <div class="button-sp-area">
+        <div align="center"><div >这里要放一个图片</div></div>
+        <div ><a href="{{ url_gochat }}"  class="weui-btn weui-btn_plain-primary" style="width: 200px">随机匹配</a>  </div>
+        </div>
 
+    {% elif state == '2' %}  {# 匹配中 #}
+        <div class="weui-msg">
+            <div class="weui-msg__icon-area"><i class="weui-icon-waiting weui-icon_msg"></i></div>
+            <div class="weui-msg__text-area">
+                <h2 class="weui-msg__title">匹配中，请留意微信提醒</h2>
+                <p class="weui-msg__desc">网友都比较忙，系统自动匹配30分钟</p>
+            </div>
+        </div>
+        <br>
+        <br>
+        <div align="center">  <a href="{{ url_leave }}" class="weui-btn weui-btn_mini weui-btn_default">离开</a> </div>
+
+    {% else %}
+        <div align="center">  | <a href="{{ url_leave }}">离开</a> </div>
     {% endif %}
-<!--
-<script type="text/javascript">
-    const vm = new Vue({
-    delimiters: ['[[', ']]'],
-  el: '#app',
-  data: {
-    message: "ttttttttt"
-  }
-});
-</script>
--->
-    <script src="../js/app.js"></script>
+        <div align="center">
+          <div  class="weui-cells__title">可用积分XXX</div>
+        </div>
+
+
+    <div class="weui-cells weui-cells_checkbox" id="match_type">
+        <label class="weui-cell weui-check__label" for="s11">
+            <div class="weui-cell__hd">
+                <input type="checkbox" class="weui-check" name="checkbox1" id="s11" checked="checked" >
+{#                <input type="checkbox" class="weui-check" name="checkbox1" id="s11" >#}
+                <i class="weui-icon-checked" ></i>
+            </div>
+            <div class="weui-cell__bd">
+                <p>匹配异性</p>
+            </div>
+        </label>
+
+    </div>
+{##}
+{#<div class="weui-tab">#}
+{#    <div class="weui-tab__panel">#}
+{#    <div class="weui_tab_bd"></div>#}
+{#    <div>325</div>#}
+{#</div>#}
+
+    <div class="weui-tabbar">
+        <a href="" class="weui-tabbar__item weui-bar__item_on">
+            <img src=" " alt="" class="weui-tabbar__icon">
+            <p class="weui-tabbar__label">快聊</p>
+        </a>
+        <a href="chat-list" class="weui-tabbar__item">
+            <img src="" alt="" class="weui-tabbar__icon">
+            <p class="weui-tabbar__label">消息</p>
+        </a>
+        <a href="my" class="weui-tabbar__item">
+            <img src="./images/icon_tabbar.png" alt="" class="weui-tabbar__icon">
+            <p class="weui-tabbar__label">我的</p>
+        </a>
+
+    </div>
+
+
+
+
+{#    <script src="../js/app.js"></script>#}
 
 </body>
 </html>

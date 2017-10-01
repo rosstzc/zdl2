@@ -107,6 +107,7 @@ def index(req):
 
         #发出邀请
         action = req.GET.get('action')
+        sex_match = req.COOKIES.get('sex_match')
         if action == 'gochat':
             if my.state == '3':   #在聊中
                 response = HttpResponseRedirect(reverse('index'))
@@ -117,6 +118,13 @@ def index(req):
 
                 #到user表找 匹配中的人； todoo 写入一个最近匹配时间，这样就不用一个自动脚本来刷新用户状态
                 user = User.objects.filter(state='2').exclude(id=uid)
+
+                #选择匹配异性进入如下模式, 如果自己有性别匹配异性，如果没有就随便匹配
+                if sex_match == '1' :
+                    if my.sex == '0':
+                        user = user.filter(sex='1')
+                    if my.sex == '1':
+                        user = user.filter(sex='0')
                 if user.count() > 0:
                     user_chat = user[0]
                     time = GetTimeNow()
@@ -128,8 +136,8 @@ def index(req):
                     user_chat.state = '3'
                     user_chat.save()
                     response = HttpResponseRedirect(reverse('index'))
-                else:
-                    return HttpResponse('all is busy') #todoo 前端要效果
+                # else:
+                #     return HttpResponse('all is busy') # 前端要效果
 
 
         #退出聊天
@@ -250,14 +258,14 @@ class Login(View):
         username = req.POST.get('username')
         password = req.POST.get('password')
         user = User.objects.filter(username=username, password=password)
-        uid = user[0].id
         if user.count() > 0:
+            user = user[0]
             response = HttpResponseRedirect(reverse('index'))
             # response.set_cookie('wname', user.get('wname'), max_age=10000000000)
-            response.set_cookie('UID', uid, max_age=10000000000)
-            response.set_cookie('name', user.get('name'), max_age=10000000000)
-            response.set_cookie('info', user.get('introdution'), max_age=10000000000)
-            response.set_cookie('image_url', user.get('image_url'), max_age=10000000000)
+            response.set_cookie('UID', user.id, max_age=10000000000)
+            response.set_cookie('name', user.name, max_age=10000000000)
+            response.set_cookie('info', user.introdution, max_age=10000000000)
+            response.set_cookie('image_url', user.image_url, max_age=10000000000)
             return response
         else:
             return  HttpResponse("用户名或密码错误")
