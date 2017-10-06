@@ -6,6 +6,3 @@
     message: 'Hello Vue!'
   }
 })
-
-
-

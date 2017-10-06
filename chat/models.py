@@ -37,7 +37,7 @@ class User(models.Model):
         ('1', '男'),
         ('2', '其他'),
     )
-    sex = models.CharField(max_length=10, choices=sex_choices, default='3', verbose_name='* 性别 /Sex', blank=True)
+    sex = models.CharField(max_length=10, choices=sex_choices, default='2', verbose_name='* 性别 /Sex', blank=True)
 
     age_choices = (
         ('1', '12~18'),
@@ -46,7 +46,7 @@ class User(models.Model):
         ('4', '33~40'),
         ('5', '40以上'),
     )
-    age = models.CharField(max_length=10, choices=age_choices, verbose_name='* 年龄 /Age' , blank=True)
+    age = models.CharField(max_length=10, choices=age_choices, default='2' ,verbose_name='* 年龄 /Age' , blank=True)
 
     xingzuo =  models.CharField(max_length=50, verbose_name='星座', blank=True)
     like =  models.CharField(max_length=50, verbose_name='', blank=True)
@@ -59,7 +59,7 @@ class User(models.Model):
     time_login_today = models.CharField(max_length=100,blank=True)
     city = models.CharField(max_length=50, verbose_name='', blank=True)
     industry = models.CharField(max_length=50, verbose_name='', blank=True)
-    introdution = models.TextField()
+    introduction = models.TextField()
 
     #image0, image1, image2...
     image_url = models.TextField(blank=True,) #用json呈现

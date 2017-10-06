@@ -7,9 +7,12 @@
     <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
     <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
 
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-        <script src="https://unpkg.com/vue"></script>
+{#    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>#}
+{#        <script src="https://unpkg.com/vue"></script>#}
 
+    <style type="text/css">
+        body {background-color: #f8f8f8}
+    </style>
 
 </head>
 
@@ -17,27 +20,37 @@
 
 
     <div class="container" id="app">
-      <h3 class="text-center">聊天列表</h3>
-
-        {% for i in chatList %}
-            <div>用户名：{{ i.sid.name }}</div>
-            <div>最近一条聊天记录：{{ i.content }}</div>
-            <div>时间：{{ i.time }}</div>
-            <div>---------------</div>
-        {% endfor %}
+{#      <h3 class="text-center">聊天列表</h3>#}
+{##}
+{#        {% for i in chatList %}#}
+{#            <div>用户名：{{ i.sid.name }}</div>#}
+{#            <div>最近一条聊天记录：{{ i.content }}</div>#}
+{#            <div>时间：{{ i.time }}</div>#}
+{#            <div>---------------</div>#}
+{#        {% endfor %}#}
     </div>
 
-<!--
-<script type="text/javascript">
-    const vm = new Vue({
-    delimiters: ['[[', ']]'],
-  el: '#app',
-  data: {
-    message: "ttttttttt"
-  }
-});
-</script>
--->
+    <div class="weui-panel weui-panel_access">
+        <div class="weui-panel__hd">聊过的</div>
+
+        <div class="weui-panel__bd">
+        {% for i in chatList %}
+            <a href=" {{ i.url }}" class="weui-media-box weui-media-box_appmsg">
+                <div class="weui-media-box__hd">
+                    <img class="weui-media-box__thumb" src="/media/{{ i.i.sid.image1 }}" alt="">
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
+                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
+                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
+                </div>
+
+            </a>
+        {% endfor %}
+        </div>
+    </div>
+
+
     <script src="../js/app.js"></script>
 
 </body>

@@ -264,7 +264,7 @@ class Login(View):
             # response.set_cookie('wname', user.get('wname'), max_age=10000000000)
             response.set_cookie('UID', user.id, max_age=10000000000)
             response.set_cookie('name', user.name, max_age=10000000000)
-            response.set_cookie('info', user.introdution, max_age=10000000000)
+            response.set_cookie('info', user.introduction, max_age=10000000000)
             response.set_cookie('image_url', user.image_url, max_age=10000000000)
             return response
         else:
@@ -288,7 +288,15 @@ def chatList(req):
     #todoo 以前是每次发信都要刷新inbox表，比较浪费资源。。优化：访问该页时才刷新最近那一条对话信息 （还是不行，要循环50次）
 
     result = ChatList.objects.select_related().filter(rid=uid).order_by('-time')[:50]
-    context = {'chatList': result}
+
+    chats = []
+    for i in result:
+        a = GetSiteUrl(req) + 'message/' + str(i.sid_id)
+        # urls.append(a)
+        chats.append({'i':i, 'url':a})
+
+
+    context = {'chatList': chats}
     response = render(req, 'message/chat_list.html', context)
     return response
 
@@ -303,15 +311,19 @@ def showMessage(req,rid):
         #todoo发送信息，日后采用异步实现
 
         msg = req.POST.get('msg')
-        saveMessage(req, uid, rid, msg)
+        if msg != '':
+            saveMessage(req, uid, rid, msg)
         url_full = HttpRequest.build_absolute_uri(req)
         return HttpResponseRedirect(url_full)
+
+
 
     else:
         #对方名字
         userbName = User.objects.get(id=rid).name
         userbUrl = GetUserUrl(req, rid)
-        result = Message.objects.select_related().filter(Q(sid_id=uid, rid_id=rid) | Q(sid_id=rid,rid_id=uid))
+        result = Message.objects.select_related().\
+            filter(Q(sid_id=uid, rid_id=rid) | Q(sid_id=rid,rid_id=uid)).order_by('-s_time')[:100]
 
     context = {'msgs': result,
                'name':userbName,
@@ -375,12 +387,19 @@ class ModifyInfo(View):
     def post(self,req):
         uid = req.COOKIES.get('UID')
         my = User.objects.get(id=uid)
-        name = req.POST.get('name')
-        imagae1 = req.FILES['image1']
+        # imagae1 = req.FILES['image1']
+
         #todoo
-        my.name = name
-        my.image1 = imagae1
+        my.name = req.POST.get('name')
+        my.sex = req.POST.get('sexInput')
+        my.age = req.POST.get('ageInput')
+        my.xingzuo = req.POST.get('xingzuo')
+        my.city = req.POST.get('city')
+        my.industry = req.POST.get('industry')
+        my.introduction = req.POST.get('introduction')
+        # my.image1 = imagae1
         my.save()
+
         url = GetSiteUrl(req) + 'user/' + uid
         response = HttpResponseRedirect(url)
         return response

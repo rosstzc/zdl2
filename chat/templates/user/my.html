@@ -10,22 +10,23 @@
 {#    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>#}
 {#        <script src="https://unpkg.com/vue"></script>#}
 
+    <style type="text/css">
+        body {background-color: #f8f8f8}
+    </style>
 
 </head>
 
-<body>
 
-    <div class="container" id="app">
-          <h3 class="text-center">我的</h3>
-        <div>用户id：{{ my.id }}</div>
-
-        <div>用户名：{{ my.name }}</div>
-        <div>状态：{{ my.state }}</div>
-        <div>可用积分：{{ my.score_today }}</div>
-        <div><a href="{{ url_info }}"> 去我的资料</a></div>
-    </div>
-
-
+<body >
+{#    <div class="container" id="app" >#}
+{#          <h3 class="text-center">我的</h3>#}
+{#        <div>用户id：{{ my.id }}</div>#}
+{##}
+{#        <div>用户名：{{ my.name }}</div>#}
+{#        <div>状态：{{ my.state }}</div>#}
+{#        <div>可用积分：{{ my.score_today }}</div>#}
+{#        <div><a href="{{ url_info }}"> 去我的资料</a></div>#}
+{#    </div>#}
 
     <div class="weui-panel weui-panel_access">
 {#            <div class="weui-panel__hd">图文组合列表</div>#}
@@ -44,7 +45,18 @@
 
     </div>
 
+    <div></div>
 
+<div class="weui-cells">
+            <a class="weui-cell weui-cell_access" href="javascript:;">
+                <div class="weui-cell__bd">
+                    <p>邀请朋友</p>
+                </div>
+                <div class="weui-cell__ft">送积分</div>
+            </a>
+
+
+</div>
     <div></div>
 
 <div class="weui-cells">
@@ -52,13 +64,13 @@
                 <div class="weui-cell__bd">
                     <p>购买金币</p>
                 </div>
-                <div class="weui-cell__ft"></div>
+                <div class="weui-cell__ft">ff</div>
             </a>
             <a class="weui-cell weui-cell_access" href="javascript:;">
                 <div class="weui-cell__bd">
-                    <p>购买</p>
+                    <p>购买积分</p>
                 </div>
-                <div class="weui-cell__ft"></div>
+                <div class="weui-cell__ft">可用积分：{{ my.score_today }}</div>
             </a>
 
 </div>
