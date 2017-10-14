@@ -27,6 +27,7 @@ from leancloud import Query
 from leancloud.errors import LeanCloudError
 
 import logging
+import json
 logging.basicConfig(level=logging.DEBUG)
 from django.http import HttpResponse
 
@@ -71,7 +72,6 @@ def index(req):
                 rid = i.uid
                 break
 
-
         #没匹配到,提示没找到
         if rid == 0:
             print ('random_not_match')
@@ -83,8 +83,6 @@ def index(req):
             record.set('sid',currentUser.uid)
             record.set('rid',rid)
             record.set('close','0')
-
-
         return
 
     #get方法
@@ -116,7 +114,7 @@ def index(req):
                 my.state = '2'
                 my.save()
 
-                #到user表找 匹配中的人； todoo 写入一个最近匹配时间，这样就不用一个自动脚本来刷新用户状态
+                #到user表找状态"匹配中"的人； todoo 写入一个最近匹配时间，这样就不用一个自动脚本来刷新用户状态；
                 user = User.objects.filter(state='2').exclude(id=uid)
 
                 #选择匹配异性进入如下模式, 如果自己有性别匹配异性，如果没有就随便匹配
@@ -126,16 +124,45 @@ def index(req):
                     if my.sex == '1':
                         user = user.filter(sex='0')
                 if user.count() > 0:
-                    user_chat = user[0]
-                    time = GetTimeNow()
-                    chat = Chat(sid_id=user_chat.id, rid_id=uid, mode='1', time=time, close='0')
-                    chat.save()
 
-                    my.state = '3'
-                    my.save()
-                    user_chat.state = '3'
-                    user_chat.save()
-                    response = HttpResponseRedirect(reverse('index'))
+                    #12小时内匹配过的不重复匹配
+                    start = OnlineTime(8)
+                    chatRecord = Chat.objects.select_related().filter(Q(rid=uid) | Q(sid=uid), close='1',time__gt=start)
+
+                    # todoo 把user查询结果与聊天记录表校验：先找到所有""用户，然后逐个到最近对话列表里检查，取没有出现的第一个
+                    key = 0 #是否有
+                    x = 0
+                    user_chat = user[0]
+                    for i in user:
+                        k = 0
+                        for j in chatRecord:
+                            if i.id == j.sid_id or i.id == j.rid_id:
+                                k = k + 1
+                        #如果最近没有聊过,就取这个
+                        if k == 0:
+                            key = 1
+                            user_chat = user[x]
+                            break
+                        x = x + 1
+
+                    #匹配到
+                    if key == 1:
+                        time = GetTimeNow()
+                        chat = Chat(sid_id=user_chat.id, rid_id=uid, mode='1', time=time, close='0')
+                        chat.save()
+
+                        my.state = '3'
+                        my.score_today = str(int(my.score_today) - 1)
+                        my.score_sum = str(int(my.score_sum) + 1)
+                        my.save()
+                        user_chat.state = '3'
+                        user_chat.score_today = str(int(user_chat.score_today) - 1)
+                        user_chat.score_sum = str(int(user_chat.score_sum) + 1)
+                        user_chat.save()
+                        response = HttpResponseRedirect(reverse('index'))
+                        return response
+
+
                 # else:
                 #     return HttpResponse('all is busy') # 前端要效果
 
@@ -158,22 +185,25 @@ def index(req):
 
 
         #如果状态是"聊天中"，
+        url_info = ''
         user_chat = ''
         if my.state == '3':
             chat = Chat.objects.select_related().filter(Q(rid=uid) | Q(sid=uid), close='0')
             user_chat = ''
             if chat.count() > 0:
                 user_chat = GetUserChat(chat[0],uid)
+                url_info = GetSiteUrl(req) +'user/' + str(user_chat.id)
 
             # content = {'my': my, 'user_chat':user_chat, 'state':'3'}
             # response = render(req, 'chat/chat.html', content)
             # return response
-
-
+        score_aviable = int(my.score_today) + int(my.score_forever)
+        url_site = GetSiteUrl(req)
         url_gochat = GetSiteUrl(req) + '?action=gochat'
         url_leave = GetSiteUrl(req) + '?action=leave'
-        test = my.state
-        content = {'my': my, 'user_chat':user_chat, 'state':my.state, 'url_gochat':url_gochat, 'url_leave':url_leave}
+        content = {'my': my, 'user_chat':user_chat, 'state':my.state,
+                   'url_gochat':url_gochat, 'url_leave':url_leave, 'url_info':url_info, 'url_site':url_site,
+                   'score_available':score_aviable}
         response = render(req, 'chat/chat.html', content)
         return response
 
@@ -193,6 +223,36 @@ def index(req):
 
     #当前方案：本方法内调用获取登录后user数据，然后python渲染内容，包括写cookie
     #API方案: 前端js调用api获取数据，然后js渲染内容
+
+
+
+def invite(req):
+    action = req.GET.get('action')
+    uid = req.GET.get('uid')
+    if req.COOKIES.get('daqi'):
+        count = req.COOKIES.get('daqi')
+    else:
+        count = 0
+    my = User.objects.get(id=uid)
+
+    if req.method == 'POST':
+        count = int(count) + 1
+
+    content = {'my': my, 'count':count}
+    #打气
+    if action == 'daqi':
+        response = render(req, 'user/daqi.html', content)
+        response.set_cookie('daqi',str(count), max_age=10000000000)
+        return response
+
+    response = render(req, 'user/invite.html', content)
+    return response
+
+
+def score_desc(req):
+    content = {}
+    response = render(req, 'chat/score_desc.html', content)
+    return response
 
 
 # find the user chatting with me
@@ -223,24 +283,25 @@ class Register(View):
     def post(self, req):
         username = req.POST.get('username')
         password = req.POST.get('password')
+        code = req.POST.get('code')
         name = req.POST.get('name')
         #不能有相同用户名
         test = User.objects.filter(username=username)
         if test.count() > 0:
             return HttpResponse('have the same username')
 
+        if code == 'kidd888':
+            user = User(username= username, password= password, name=username)
+            user.save()
+            context = {'user': user}
 
-        user = User(username= username, password= password, name=username)
-        user.save()
-        context = {'user': user}
-
-        url = reverse('index')
-        response = HttpResponseRedirect(url)
-        # response.set_cookie('W_NAME', user, max_age=10000000000)
-        response.set_cookie('UID', user.id, max_age=10000000000)
-        # response.set_cookie('NAME', user.id, max_age=10000000000)
-        return response
-
+            url = reverse('index')
+            response = HttpResponseRedirect(url)
+            # response.set_cookie('W_NAME', user, max_age=10000000000)
+            response.set_cookie('UID', user.id, max_age=10000000000)
+            # response.set_cookie('NAME', user.id, max_age=10000000000)
+            return response
+        return HttpResponse("要向管理员申请内部验证码")
 
     def get(self, req):
         context = {'': ''}
@@ -360,16 +421,19 @@ def saveMessage(req, sid, rid, msg):
 
 def userProfile(req,uid):
     user = User.objects.get(id=uid)
+    imgs = UserImg.objects.filter(uid_id=uid)
+    count = imgs.count()
     my_uid = req.COOKIES.get('UID')
+    url_avatar = GetSiteUrl(req) + 'media/' + user.image1.name
     myself = '0' #不是本人
     if my_uid == uid:
         myself = '1'
         url_modify_info = GetSiteUrl(req) + 'modify-info'
-        context = {'user': user,'myself':myself, 'url':url_modify_info}
+        context = {'user': user,'myself':myself, 'url':url_modify_info, 'imgs':imgs, 'url_avatar':url_avatar}
         response = render(req, 'user/info.html', context)
         return response
 
-    context = {'user': user}
+    context = {'user': user, 'imgs':imgs, 'url_avatar':url_avatar}
     response = render(req, 'user/info.html', context)
     return response
 
@@ -378,16 +442,44 @@ def my(req):
     uid = req.COOKIES.get('UID')
     my = User.objects.get(id=uid)
     url_info = GetSiteUrl(req) + 'user/' + uid
-    context = {'my': my, 'url_info':url_info}
+    url_daqi =  GetSiteUrl(req) + 'invite?action=daqi&uid=' + str(uid)
+    context = {'my': my, 'url_info':url_info, 'url_daqi':url_daqi}
     response = render(req, 'user/my.html', context)
     return response
 
 
 class ModifyInfo(View):
     def post(self,req):
+
         uid = req.COOKIES.get('UID')
         my = User.objects.get(id=uid)
-        # imagae1 = req.FILES['image1']
+
+        #更新头像
+        avatar_key = req.POST.get('avatar_key','')
+        if avatar_key == '1':
+            my.image1.delete()  #先删除原来头像
+            avatar = req.FILES['avatar']
+            my.image1 = avatar
+            my.image1.name = 'avatar' + str(uid) + '.jpg'
+            my.save()
+            return HttpResponse('1')
+
+        #删除图片
+        delete_img = req.POST.get('delete_img')
+        if delete_img != ' ':
+            result = UserImg.objects.filter(uid_id=uid)
+            temp = result.count()
+            result[int(delete_img)].delete()
+
+        # 异步更新图片
+        imgData = req.POST.get('base64')
+        if imgData == ' ':
+            print ('没有上传图片')
+        else:
+            img = UserImg(uid_id=uid, imgData=imgData, time=GetTimeNow())
+            img.save()
+            return HttpResponse('1')
+
 
         #todoo
         my.name = req.POST.get('name')
@@ -397,7 +489,6 @@ class ModifyInfo(View):
         my.city = req.POST.get('city')
         my.industry = req.POST.get('industry')
         my.introduction = req.POST.get('introduction')
-        # my.image1 = imagae1
         my.save()
 
         url = GetSiteUrl(req) + 'user/' + uid
@@ -407,8 +498,10 @@ class ModifyInfo(View):
     def get(self,req):
         uid = req.COOKIES.get('UID')
         my = User.objects.get(id=uid)
+        imgs = UserImg.objects.filter(uid_id=uid)
         content = {
             'my': my,
+            'imgs':imgs,
         }
         #前端更换图片，异步调用updatePhoto把图片保存到数据库
         response = render(req, 'user/modify_info.html',content)

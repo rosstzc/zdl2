@@ -7,8 +7,6 @@
     <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
     <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
     <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
-{#        <script src="https://cdn.bootcss.com/jquery.form/4.2.2/jquery.form.js"></script>#}
-
 {#    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>#}
 {#        <script src="https://unpkg.com/vue"></script>#}
 
@@ -134,35 +132,12 @@
 			var maxWidth = 300;
 			// 最大上传图片数量
 			var maxCount = 6;
-
-			//刷新头像
-			$('#avatar').on('change',function (event) {
-			     		    alert('yy');
-
-			    avatar_form = $("#avatar_form");
-			    avatar_key = $("#avatar_key");
-			    avatar_key.val('1');
-			    avatar_form.ajaxSubmit({
-                    success: function(data) {
-                        if (data === '1') {
-                            window.location.reload();
-                        }
-                    }
-                });
-                event.stopPropagation();
-			    $('#avatar').val('');
-			    avatar_key.val('');
-            });
-
-            //刷新相册
-
 			$('.js_file').on('change', function(event) {
 				var files = event.target.files;
 				// 如果没有选中文件，直接返回
 				if (files.length === 0) {
 					return;
 				}
-
 				for (var i = 0, len = files.length; i < len; i++) {
 					var file = files[i];
 					var reader = new FileReader();
@@ -179,17 +154,15 @@
  						});
  						continue;
  					}
- 					if ($('.weui-uploader__file').length >= maxCount) {
-{# 						$.weui.alert({#}
-{# 							text : '最多只能上传' + maxCount + '张图片'#}
-{# 						});#}
- 						alert('最多只能上传' + maxCount + '张照片');
+ 					if ($('.weui_uploader_file').length >= maxCount) {
+ 						$.weui.alert({
+ 							text : '最多只能上传' + maxCount + '张图片'
+ 						});
  						return;
  					}
 					reader.onload = function(e) {
 						var img = new Image();
 						img.onload = function() {
-
 							// 不要超出最大宽度
 							var w = Math.min(maxWidth, img.width);
 							// 高度按比例计算
@@ -208,20 +181,12 @@
 
 							$('.weui-uploader__files').append($preview);
 
-
-							//异步post图片到后台,by mike
-                            $base64 = $('#base64');
-                            $base64.val(base64);
-                            $("#summit_form").ajaxSubmit({});
-
-
 							// 然后假装在上传，可以post base64格式，也可以构造blob对象上传，也可以用微信JSSDK上传
 							var progress = 0;
 							function uploading() {
 								$preview.find('.weui-uploader__file-content').text(++progress + '%');
 								if (progress < 100) {
 									setTimeout(uploading, 30);
-
 								} else {
 									// 如果是失败，塞一个失败图标
 									//$preview.find('.weui-uploader__file-content').html('<i class="weui_icon_warn"></i>');
@@ -237,47 +202,6 @@
 					reader.readAsDataURL(file);
 				}
 			});
-
-
-			//展示gallery
-            index = 0; //具体哪个图片
-			$gallery = $("#gallery");
-            $galleryImg = $("#galleryImg");
-            $uploaderFiles = $("#uploaderFiles");
-            $(".weui-uploader__files li").click(function () {
-                index = $(this).index();
-                $galleryImg.attr("style", this.getAttribute("style"));
-                $gallery.fadeIn(100);
-            });
-
-            $gallery.on("click", function(){
-                $gallery.fadeOut(100);
-            });
-
-
-
-            //弹出删除对话框
-            $iosDialog1 = $("#iosDialog1");
-            $('#showDialog').on('click', function(){
-                $iosDialog1.fadeIn(200);
-            });
-                //点取消按钮
-            $iosDialog1.on('click', '.weui-dialog__btn_default', function(){
-                $iosDialog1.fadeOut(200);
-
-            });
-                //点确定按钮，删除图片
-            $iosDialog1.on('click', '.weui-dialog__btn_primary', function(){
-                $iosDialog1.fadeOut(200);
-                $("ul").find("li").eq(index).remove();
-                delete_img = $("#delete_img");
-                delete_img.val(index);
-                $('#base64').val(' ');  //post前把图片data清理
-                $("#summit_form").ajaxSubmit({});
-
-            });
-
-
 		});
 
     </script>
@@ -287,6 +211,7 @@
 <body>
 
 
+
     <div class="container" id="app">
       <h3 class="text-center">修改资料</h3>
 {#        [[ message ]]#}
@@ -294,76 +219,52 @@
 {#    <div>用户名1：{{ my.name }}</div>#}
 {#    <div>状态：{{ my.state }}</div>#}
 {#    <div>可用积分：{{ my.score_today }}</div>#}
-    </div>
-
-    <form class="" action="" method="post" enctype="multipart/form-data" id="avatar_form">
-        {% csrf_token %}
-    <div class="weui-panel weui-panel_access">
-{#            <div class="weui-panel__hd">图文组合列表</div>#}
-            <div class="weui-panel__bd">
-                <a href="javascript:;" class="weui-media-box weui-media-box_appmsg">
-                    <div class="weui-media-box__hd">
-
-                        <img class="weui-media-box__thumb"id="show_big_avatar" src="/media/{{ my.image1 }}" alt="">
-                    </div>
-                    <div class="weui-media-box__bd">
-                        <h4 class="weui-media-box__title">头像</h4>
-
-            <div><input type="file" id="avatar" name="avatar"  calss="" /></div>
-            <div><input type="hidden" id="avatar_key" name="avatar_key" value=""  /></div>
-
-{#                        <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>#}
-                    </div>
-                </a>
-            </div>
-        </div>
-    </form>
 
 
-    <div class="weui-gallery" id="gallery">
-            <span class="weui-gallery__img" id="galleryImg"></span>
-            <div class="weui-gallery__opr">
-                <a href="javascript:" class="weui-gallery__del" id="showDialog">
-                    <i class="weui-icon-delete weui-icon_gallery-delete"></i>
-                </a>
-            </div>
-    </div>
+ <div class="weui-cells weui-cells_form" id="uploaderCustom">
+     <div class="weui-cell">
+         <div class="weui-cell__bd">
+             <div class="weui-uploader">
+                 <div class="weui-uploader__hd">
+                     <p class="weui-uploader__title">图片上传</p>
+                 </div>
+                 <div class="weui-uploader__bd">
+                 <ul class="weui-uploader__files" id="uploaderCustomFiles"></ul>
+                 <div class="weui-uploader__input-box"> <input id="uploaderCustomInput" class="weui-uploader__input" type="file" accept="image/*" multiple=""></div>
+                 </div>
+             </div>
+         </div>
+     </div>
+ </div>
 
-
-
-    <div class="weui-cells weui-cells_form">
-        <form method="post">
-            <div class="weui-cells__title">照片</div>
-            <div class="weui-cell">
-                <div class="weui-cell__bd">
-                    <div class="weui-uploader__bd">
-                        <ul class="weui-uploader__files" id="uploaderFiles">
-                            {% for i in imgs %}
-                            <li class="weui-uploader__file" style="background-image:url({{ i.imgData }})">
-                            </li>
-                            {% endfor %}
-                        </ul>
-                        <div class="weui-uploader__input-box">
-                            <input id="uploaderInput" class="weui-uploader__input js_file" type="file" accept="image/*" multiple>
-                        </div>
-                    </div>
-                </div>
-            </div>
-{#            <div class="weui-btn-area"><a href="javascript:;" class="weui-btn weui-btn_primary">保存</a></div>#}
-        </form>
-    </div>
+<div class="weui-cells weui-cells_form">
+	<form method="post">
+		<div class="weui-cells__title">照片</div>
+		<div class="weui-cell">
+			<div class="weui-cell__bd">
+				<div class="weui-uploader__bd">
+					<ul class="weui-uploader__files">
+						<li class="weui-uploader__file" style="background-image:url(http://imgsize.ph.126.net/?imgurl=http://cms-bucket.nosdn.127.net/ba2d23de68ad4dcc8ed67622f911f14c20170113154227.png_140x88x1x85.jpg)">
+						</li>
+					</ul>
+					<div class="weui-uploader__input-box">
+						<input id="uploaderInput" class="weui-uploader__input js_file" type="file" accept="image/*" multiple>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="weui-btn-area"><a href="javascript:;" class="weui-btn weui-btn_primary">保存</a></div>
+	</form>
+</div>
 
 
 
 
 
 
-<form class="" action="" method="post" enctype="multipart/form-data" id="summit_form">
+<form class="" action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
     <div class="container" id="pp">
-
-        <input class="weui-input" type="hidden"  value=" " name="base64" id="base64" placeholder=""/>
-        <input class="weui-input" type="hidden"  value=" " name="delete_img" id="delete_img" placeholder=""/>
 
         <div class="weui-cells__title">资料</div>
         <div class="weui-cells weui-cells_form">
@@ -415,6 +316,9 @@
                 </div>
             </div>
         </div>
+{#            <div><img src="/media/{{ my.image1 }}" name="showImage1"></div>#}
+{#                <img src="">#}
+{#            <div><input type="file" id="file" name="image1"  /></div>#}
 
 
         <div class="weui-btn-area">
@@ -426,19 +330,6 @@
 </form>
 
 
-    <div id="dialogs">
-        <!--BEGIN dialog1-->
-        <div class="js_dialog" id="iosDialog1" style="display: none;">
-            <div class="weui-mask"></div>
-            <div class="weui-dialog">
-                <div class="weui-dialog__bd">确定删除该图片？</div>
-                <div class="weui-dialog__ft">
-                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_default" id="delete_cancel">取消</a>
-                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary" id="delete_confirm">确定</a>
-                </div>
-            </div>
-        </div>
-    </div>
 
 <!--
 <script type="text/javascript">

@@ -23,7 +23,6 @@ from django.db import models
 
 
 
-
 class User(models.Model):
     # W_ID = models.CharField(max_length=50, blank=True ,verbose_name='* 微信号',
     #                         help_text='到微信的"个人信息"复制微信号，粘贴到这里。注意不是名字哦' )
@@ -51,15 +50,18 @@ class User(models.Model):
     xingzuo =  models.CharField(max_length=50, verbose_name='星座', blank=True)
     like =  models.CharField(max_length=50, verbose_name='', blank=True)
     score_today = models.CharField(max_length=50, verbose_name='', blank=True)
-    score_forever = models.CharField(max_length=50, verbose_name='', blank=True)
-    score_sum = models.CharField(max_length=50, verbose_name='', blank=True)
-    coin = models.CharField(max_length=50, verbose_name='', blank=True)
-    online = models.CharField(max_length=50, verbose_name='', blank=True)
-    state = models.CharField(max_length=50, verbose_name='', blank=True)
+    score_forever = models.CharField(max_length=50, default='10', verbose_name='', blank=True)   #永久可用积分，比较花钱买物品送的积分
+    score_sum = models.CharField(max_length=50, default='10',verbose_name='', blank=True)  #累计积分，用做等级统计
+    coin = models.CharField(max_length=50, default='0',verbose_name='', blank=True)
+    online = models.CharField(max_length=50, default='1',verbose_name='', blank=True)
+    state = models.CharField(max_length=50, default='1',verbose_name='', blank=True)
     time_login_today = models.CharField(max_length=100,blank=True)
     city = models.CharField(max_length=50, verbose_name='', blank=True)
     industry = models.CharField(max_length=50, verbose_name='', blank=True)
     introduction = models.TextField()
+
+    interest = models.CharField(max_length=200, verbose_name='', blank=True)
+    user_type = models.CharField(max_length=200, default='1', verbose_name='', blank=True)
 
     #image0, image1, image2...
     image_url = models.TextField(blank=True,) #用json呈现
@@ -142,6 +144,13 @@ class User(models.Model):
     def __unicode__(self):
 
         return self.name
+
+
+class UserImg(models.Model):
+    uid = models.ForeignKey(User, related_name='uid_img')
+    imgData = models.TextField(blank=True)
+    time = models.CharField(max_length=100,blank=True)
+
 
 
 class Complain(models.Model):

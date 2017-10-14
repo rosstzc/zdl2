@@ -49,7 +49,7 @@ SECRET_KEY = 'i6m5^6xdt9bmn=zh2v8jwjz(donw)b(zo8p@a6evbp7(%r@-zf'
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -100,18 +100,31 @@ WSGI_APPLICATION = 'zdl.wsgi.application'
 
 
 
+    #
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'zdl',
+#         'USER':'root',
+#         'PASSWORD':'lbj100200',
+#         'HOST':'120.25.13.110',
+#         'PORT':'3306',
+#     }
+# }
+
 
 # 线上数据库的配置
 
 if 'SERVER_SOFTWARE' in os.environ:
-#sae 环境
-    from sae.const import (
-        MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB
-    )
+# sae 环境
+   from sae.const import (
+       MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB
+   )
 
 
 else:
-#本地环境
+# 本地环境
     # Make `python manage.py syncdb` works happy!
     MYSQL_HOST = ''
     MYSQL_PORT = ''

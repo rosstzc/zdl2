@@ -41,6 +41,27 @@
                 }
              });
 
+            {#  如积分等0，那么就提示去赚积分  #}
+            chat_btn = $('.weui-btn_plain-primary');
+            score_availble = {{ score_available }};
+            chat_btn.click(function () {
+                if (score_availble === 0) {
+                    //弹出删除对话框
+                    $iosDialog1 = $("#iosDialog1");
+                    $iosDialog1.fadeIn(200);
+                    //点取消按钮
+                    $iosDialog1.on('click', '.weui-dialog__btn_default', function(){
+                        $iosDialog1.fadeOut(200);
+                    });
+                        //点确定按钮，删除图片
+                    $iosDialog1.on('click', '.weui-dialog__btn_primary', function(){
+                        $iosDialog1.fadeOut(200);
+                    });
+{#                    alert('333');#}
+                    return false
+                }
+            });
+
         })
     </script>
 
@@ -49,24 +70,25 @@
 
 <body>
 
-      <h3 class="text-center">这是首页</h3>
+{#      <h3 class="text-center">这是首页</h3>#}
 {#        [[ message ]]#}
-      <h3 class="text-center">自己信息</h3>
-        <div>用户id：{{ my.id }}</div>
-    <div>用户名：{{ my.name }}</div>
-    <div>状态：{{ my.state }}</div>
-    <div>性别：{{ my.sex }}</div>
-    <div>可用积分：{{ my.score_today }}</div>
+{#      <h3 class="text-center">自己信息</h3>#}
+{#        <div>用户id：{{ my.id }}</div>#}
+{#    <div>用户名：{{ my.name }}</div>#}
+{#    <div>状态：{{ my.state }}</div>#}
+{#    <div>性别：{{ my.sex }}</div>#}
+{#    <div>可用积分：{{ my.score_today }}</div>#}
+{##}
+{#    {% if state == '3'  %}#}
+{#      <h3 class="text-center">对方用户(如果有)</h3>#}
+{#    <div>用户id：{{ user_chat.id }}</div>#}
+{#    <div>用户呢称：{{ user_chat.name }}</div>#}
+{#    <div>性别：{{ user_chat.sex }}</div>#}
+{#            <div>状态：{{ user_chat.state }}</div>#}
+{#    <div>个人简介：{{ user_chat.introdution}}</div>#}
+{#    <div>头像url：{{ user_chat.image_url }}</div>#}
+{#    {% endif %}#}
 
-    {% if state == '3'  %}
-      <h3 class="text-center">对方用户(如果有)</h3>
-    <div>用户id：{{ user_chat.id }}</div>
-    <div>用户呢称：{{ user_chat.name }}</div>
-    <div>性别：{{ user_chat.sex }}</div>
-            <div>状态：{{ user_chat.state }}</div>
-    <div>个人简介：{{ user_chat.introdution}}</div>
-    <div>头像url：{{ user_chat.image_url }}</div>
-    {% endif %}
 
     {% if state == '1' %}   {# 空闲中 #}
         <div class="button-sp-area">
@@ -86,13 +108,40 @@
         <br>
         <div align="center">  <a href="{{ url_leave }}" class="weui-btn weui-btn_mini weui-btn_default">离开</a> </div>
 
-    {% else %}
-        <div align="center">  | <a href="{{ url_leave }}">离开</a> </div>
-    {% endif %}
-        <div align="center">
-          <div  class="weui-cells__title">可用积分XXX</div>
+    {% else %}   {# 成功匹配 #}
+
+        <div style="margin-top: 20px" class="weui-panel weui-panel_access">
+{#            <div class="weui-panel__hd">图文组合列表</div>#}
+            <div class="weui-panel__bd">
+                <a href="{{ url_info }}" class="weui-media-box weui-media-box_appmsg">
+                    <div class="weui-media-box__hd">
+                        <img class="weui-media-box__thumb" src="/media/{{ user_chat.image1 }}" alt="">
+                    </div>
+                    <div class="weui-media-box__bd">
+                        <h4 class="weui-media-box__title">{{ user_chat.name }}</h4>
+                        <p class="weui-media-box__desc">{{ user_chat.introduction }}</p>
+                    </div>
+                </a>
+            </div>
         </div>
 
+        <div class="weui-msg">
+            <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+            <div class="weui-msg__text-area">
+                <h2 class="weui-msg__title">成功匹配 <a href="{{ url_info }}">{{ user_chat.name }}</a>，点左上角『返回/关闭』到公众号对话框与TA对话.</h2>
+{#                <p class="weui-msg__desc">网友都比较忙，系统自动匹配30分钟</p>#}
+            </div>
+        </div>
+
+        <div align="center">  | <a href="{{ url_leave }}">离开</a> </div>
+    {% endif %}
+
+
+        <div align="center">
+            <a href="http://baidu.com">
+          <div  class="weui-cells__title">可用积分：{{ score_available }}</div>
+                </a>
+        </div>
 
     <div class="weui-cells weui-cells_checkbox" id="match_type">
         <label class="weui-cell weui-check__label" for="s11">
@@ -116,22 +165,34 @@
 
     <div class="weui-tabbar">
         <a href="" class="weui-tabbar__item weui-bar__item_on">
-            <img src=" " alt="" class="weui-tabbar__icon">
+            <img src="{{ url_site }}media/icon/icons8-Lightning Bolt_2.png" alt="" class="weui-tabbar__icon">
             <p class="weui-tabbar__label">快聊</p>
         </a>
         <a href="chat-list" class="weui-tabbar__item">
-            <img src="" alt="" class="weui-tabbar__icon">
+            <img src="{{ url_site }}media/icon/icons8-Comments Filled.png" alt="" class="weui-tabbar__icon">
             <p class="weui-tabbar__label">消息</p>
         </a>
         <a href="my" class="weui-tabbar__item">
-            <img src="./images/icon_tabbar.png" alt="" class="weui-tabbar__icon">
+            <img src="{{ url_site }}media/icon/icons8-User.png" alt="" class="weui-tabbar__icon">
             <p class="weui-tabbar__label">我的</p>
         </a>
 
     </div>
 
 
-
+    <div id="dialogs">
+        <!--BEGIN dialog1-->
+        <div class="js_dialog" id="iosDialog1" style="display: none;">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__bd">你今天的可用积分已用完，可邀请朋友来打气获得积分</div>
+                <div class="weui-dialog__ft">
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_default" id="delete_cancel">取消</a>
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary" id="delete_confirm">去邀请</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {#    <script src="../js/app.js"></script>#}
 
