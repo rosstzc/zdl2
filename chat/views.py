@@ -16,7 +16,7 @@ from models import *
 from django.db.models import Q
 
 from view_func import *    #公共方法
-
+ 
 
 from django.template.context import RequestContext
 # Create your views here.
