@@ -116,6 +116,13 @@ def PostMessge(token,post):
     return response
 
 
+#把json中双引号转义，避免出错。
+def PostFormat(content):
+    content = content.replace("\"", "\\\"")
+    return content
+
+
+
 def PostText(OPENID,content):
     #文本
     template = '{ "touser":"'+ OPENID + '", "msgtype":"text", "text":{"content":"'+ content + '"}}'

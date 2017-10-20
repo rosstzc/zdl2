@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
-    <title>打气</title>
+    <title>朋友多人气多，来帮我加点人气吧</title>
     <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
     <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js
+"></script>
+        <script src="https://cdn.bootcss.com/jquery.form/4.2.2/jquery.form.js"></script>
+
 
 {#    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>#}
 {#        <script src="https://unpkg.com/vue"></script>#}
@@ -16,39 +21,198 @@
 
 </head>
 
+<script>
+    $(function(){
+        var $toast = $('#toast');
+        var uid = {{ user.id }};
+        var daqiCookieCountUid = 'daqiCookieCount33' + uid.toString();
+{#          检查是否超过打气数#}
+        if ($.cookie(daqiCookieCountUid) === undefined) {
+            {#第一次打气#}
+{#            alert('55');#}
+            $.cookie(daqiCookieCountUid, '0', { expires: 7 });
+            $('.count').text('0');
+        }else {
+            $('.count').text( $.cookie(daqiCookieCountUid));
+        }
+
+
+        $('#showToast').on('click', function(){
+            //先检查是否未本人
+            myself = {{ myself }};
+            $iosDialog2 = $('#iosDialog2');
+            if (myself === 1) {
+{#                alert('3');#}
+                $iosDialog2.fadeIn(200);
+
+                $iosDialog2.on('click', '.weui-dialog__btn_primary', function(){
+                $iosDialog2.fadeOut(200);
+
+                });
+            }else{
+                               //检查打气次数
+                count = $.cookie(daqiCookieCountUid);
+                if (Number(count) > 9){
+                    {# 超过了打气数量,弹出确认窗口#}
+
+                    //弹出对话框
+                $iosDialog1 = $("#iosDialog1");
+                $iosDialog1.fadeIn(200);
+
+
+                $iosDialog1.on('click', '.weui-dialog__btn_default', function(){
+                    $iosDialog1.fadeOut(200);
+
+                });
+
+                $iosDialog1.on('click', '.weui-dialog__btn_primary', function(){
+                    $iosDialog1.fadeOut(200);
+                    window.location.href = "{{ url_friend }}";
+                });
+
+                }
+                else{
+                    $("#summit_form").ajaxSubmit({});
+                    count = Number(count) + 1;
+                    $.cookie(daqiCookieCountUid, count.toString(), { expires: 7 });
+                    count = $.cookie(daqiCookieCountUid);
+                    $('.count').text(count);
+    {#                alert(count);#}
+
+                    if ($toast.css('display') != 'none') return;
+                    $toast.fadeIn(100);
+                    setTimeout(function () {
+                        $toast.fadeOut(100);
+                    }, 2000);
+                }
+            }
+
+
+
+
+
+
+
+
+        });
+    });
+
+</script>
+
 
 <body >
 
+
+    <!--BEGIN toast-->
+    <div id="toast" style="display: none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+            <p class="weui-toast__content">已加 1 人气</p>
+        </div>
+    </div>
+    <!--end toast-->
+
+
+
+
     <div class="container" id="app">
-      <h3 class="text-center">打气</h3>
+        <div class="weui-cells__title">
+            {% if myself == 1 %}
+                请点右上[...]分享到朋友圈、微博等邀请朋友帮忙打气
+            {% else %}
+            交朋识友要人气，来帮 {{ user.name }} 加点人气
+            {% endif %}
+        </div>
+{#      <h3 class="text-center">交朋识友需要人气，来帮他加点人气</h3>#}
 {#        [[ message ]]#}
     </div>
 
 
-<form class="" action="" method="post" enctype="multipart/form-data">
-{% csrf_token %}
-    <div class="container" id="pp">
+    <div class="weui-cells">
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><img  src="/media/{{ user.image1 }}" alt="" style="width:30px;height: 30px;margin-right:5px;display:block"></div>
+            <div class="weui-cell__bd">
+                <p style="font-size: 16px">大侠，请帮忙加点戏（哦不，是加点气）</p>
+            </div>
+{#            <div class="weui-cell__ft">说明文字</div>#}
+        </div>
 
-        <div class="weui-cells weui-cells_form">
-            <div class="weui-cell">
-                <div class="weui-cell__hd"><label class="weui-label">用户名</label></div>
-                <div class="weui-cell__bd">
-                    <input class="weui-input" type="text" name="username" placeholder="请输入用户名"/>
+
+
+
+
+
+        <div class="weui-cell">
+        <div align="center" style="margin-top: 20px"><img src="/media/icon/daqi.gif" style="width: 80%;"></div>
+        </div>
+
+        <div align="center"> <p class="weui-msg__desc" style="font-size: 18px">你已帮 {{ user.name }} 加了 <span class="count">0</span> 个人气</p></div>
+        <br>
+        <form class="" action="" method="post" enctype="multipart/form-data" id="summit_form">
+        {% csrf_token %}
+            <div class="container" id="pp">
+             <input class="weui-input" type="hidden"  value=" " name="test" id="test" placeholder=""/>
+                <div class="weui-btn-area">
+
+{#                    <input    value="帮Ta打气" class="weui-btn weui-btn_primary" href="javascript:" id="showToast"/>#}
+                    <a  style="width: 200px" class="weui-btn weui-btn_primary" href="javascript:" id="showToast">帮Ta打气</a>
+                </div>
+            </div>
+        </form>
+{#        <br>#}
+
+        <div class="weui-btn-area">
+                    <a href="{{ url_friend }}" style="width: 200px" class="weui-btn weui-btn_plain-primary">我也去认识新朋友</a>
+        </div>
+
+        <br>
+    </div>
+
+
+
+    <div class="weui-cells">
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><img  src="/media/icon/qrcode.jpg" alt="" style="width:130px;margin-right:5px;display:block"></div>
+            <div class="weui-cell__bd">
+                <p>九点聊天</p>
+                <p class="weui-msg__desc" >每晚九点认识有意思的新朋友、聊聊天</p>
+            </div>
+{#            <div class="weui-cell__ft">每晚九点认识新朋友、聊天</div>#}
+        </div>
+
+
+    </div>
+
+
+    <div id="dialogs">
+        <!--BEGIN dialog1-->
+        <div class="js_dialog" id="iosDialog1" style="display: none;">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__bd">真够朋友，你已帮Ta加了 <span class="count"> </span> 个人气，本周配额都用完了</div>
+                <div class="weui-dialog__ft">
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_default" id="delete_cancel">好</a>
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary" id="delete_confirm">去认识新朋友</a>
                 </div>
             </div>
         </div>
-
-
-        <div class="weui-btn-area">
-            <input type="submit" value="打气" class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips"/>
-{#            <a   class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">注册</a>#}
-        </div>
     </div>
 
-</form>
+        <!--BEGIN dialog2-->
+        <div class="js_dialog" id="iosDialog2" style="display: none;">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__bd">你是本人，请点右上[...]分享本页到朋友圈、微博等邀请朋友帮忙打气</div>
+                <div class="weui-dialog__ft">
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary">知道了</a>
+                </div>
+            </div>
+        </div>
+        <!--END dialog2-->
 
 
-
+<br>
 
 
 

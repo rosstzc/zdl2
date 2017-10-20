@@ -15,16 +15,17 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 
 import os
+import platform
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 
-if 'SERVER_SOFTWARE' in os.environ:
+if 'centos' in platform.platform():
     #线上
-    DEBUG = False
-    # DEBUG = True
+    # DEBUG = False
+    DEBUG = True
 else:
     #开发
     DEBUG = True
@@ -116,13 +117,17 @@ WSGI_APPLICATION = 'zdl.wsgi.application'
 
 # 线上数据库的配置
 
-if 'SERVER_SOFTWARE' in os.environ:
-# sae 环境
-   from sae.const import (
-       MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_PASS, MYSQL_DB
-   )
-
-
+if 'centos' in platform.platform():
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'zdl',
+            'USER':'root',
+            'PASSWORD':'lbj100200',
+            'HOST':'120.25.13.110',
+            'PORT':'3306',
+        }
+    }
 else:
 # 本地环境
     # Make `python manage.py syncdb` works happy!
@@ -132,7 +137,7 @@ else:
     MYSQL_PASS = ''
     MYSQL_DB   = 'en2401'
 
-DATABASES = {
+    DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),

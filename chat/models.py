@@ -26,7 +26,7 @@ from django.db import models
 class User(models.Model):
     # W_ID = models.CharField(max_length=50, blank=True ,verbose_name='* 微信号',
     #                         help_text='到微信的"个人信息"复制微信号，粘贴到这里。注意不是名字哦' )
-    w_name = models.CharField(max_length=50, verbose_name='* W_NAME', blank=True)
+    W_NAME = models.CharField(max_length=50, verbose_name='* W_NAME', blank=True)
     username = models.CharField(max_length=50, verbose_name='', blank=True)
     password = models.CharField(max_length=50, verbose_name='', blank=True)
     name = models.CharField(max_length=50, verbose_name='' , blank=True)
@@ -75,17 +75,17 @@ class User(models.Model):
     # W_SEX = models.CharField(max_length=10,blank=True,) #老版本字段，老版本字段，标识期望的对话的人的性别
     # STATE = models.TextField(blank=True,)
     # S_WID = models.TextField(blank=True,)  #老版本字段，现在不用，标识随机匹配的4个用户的微信号
-    # R_TIME = models.CharField(max_length=100, blank=True)
+    R_TIME = models.CharField(max_length=100, blank=True)
     # W_TIME = models.CharField(max_length=100, blank=True)
     # TIME = models.CharField(max_length=100, blank=True)
-    # POSITION = models.CharField(max_length=50, blank=True, verbose_name='所在城市|地区 /City')
+    POSITION = models.CharField(max_length=50, blank=True, verbose_name='所在城市|地区 /City')
     #
     # state_service = models.SmallIntegerField(max_length=5, default=1,blank=True)  #1空闲，2邀请中，3配对中，4对话中，5离开，6退出， 8话题在聊，9话题围观
     #
     # language = models.CharField(max_length=50, blank=True)
     # city = models.CharField(max_length=50, blank=True)
-    # province = models.CharField(max_length=50, blank=True)
-    # country = models.CharField(max_length=50, blank=True)
+    province = models.CharField(max_length=50, blank=True)
+    country = models.CharField(max_length=50, blank=True)
     # headimgurl = models.CharField(max_length=500, blank=True)
     # unionid = models.CharField(max_length=200, blank=True)
     #
@@ -211,3 +211,12 @@ class ChatList(models.Model):
     time = models.CharField(max_length=50,blank=True)
     m_type =models.CharField(max_length=2, default='1') # 信息类型，默认为1：私信
     unread = models.SmallIntegerField(default=0,blank=True)
+
+
+
+class Config(models.Model):
+
+    key = models.CharField(max_length=100,blank=True)
+    value = models.CharField(max_length=1000,blank=True)
+    version =  models.SmallIntegerField(max_length=5,default=0,blank=True)  #0是测试环境，1正式环境
+    time = models.CharField(max_length=100,blank=True)

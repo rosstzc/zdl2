@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
     <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
     <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
-{#        <script src="https://cdn.bootcss.com/jquery.form/4.2.2/jquery.form.js"></script>#}
+    <script src="https://cdn.bootcss.com/jquery.form/4.2.2/jquery.form.js"></script>
 
 {#    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>#}
 {#        <script src="https://unpkg.com/vue"></script>#}
@@ -137,7 +137,6 @@
 
 			//刷新头像
 			$('#avatar').on('change',function (event) {
-			     		    alert('yy');
 
 			    avatar_form = $("#avatar_form");
 			    avatar_key = $("#avatar_key");
@@ -145,6 +144,7 @@
 			    avatar_form.ajaxSubmit({
                     success: function(data) {
                         if (data === '1') {
+{#			     		    alert('yy');#}
                             window.location.reload();
                         }
                     }
@@ -243,8 +243,9 @@
             index = 0; //具体哪个图片
 			$gallery = $("#gallery");
             $galleryImg = $("#galleryImg");
-            $uploaderFiles = $("#uploaderFiles");
+{#            $uploaderFiles = $("#uploaderFiles");#}
             $(".weui-uploader__files li").click(function () {
+{#                alert( $(this).index());#}
                 index = $(this).index();
                 $galleryImg.attr("style", this.getAttribute("style"));
                 $gallery.fadeIn(100);

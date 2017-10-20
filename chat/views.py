@@ -20,75 +20,75 @@ from view_func import *    #公共方法
 
 from django.template.context import RequestContext
 # Create your views here.
-import leancloud
-leancloud.init("TpiAufPcAVp2cR1GRpJQIX5X-gzGzoHsz", "NSXmOEgBlq8Aghgh7LhQAUda")
-from leancloud import Object
-from leancloud import Query
-from leancloud.errors import LeanCloudError
+# import leancloud
+# leancloud.init("TpiAufPcAVp2cR1GRpJQIX5X-gzGzoHsz", "NSXmOEgBlq8Aghgh7LhQAUda")
+# from leancloud import Object
+# from leancloud import Query
+# from leancloud.errors import LeanCloudError
 
 import logging
 import json
 logging.basicConfig(level=logging.DEBUG)
-from django.http import HttpResponse
 
 from django.template.loader import get_template
 
-
+import  platform
 
 # 首页
 def index(req):
     #GET  从api/chat_state 获取数据，然后返回到chat.html
-    currentUser = leancloud.User.get_current()
+    # currentUser = leancloud.User.get_current()
     # todoo, 触发配对,日后也是要异步操作
     if req.method == 'POST':
 
         #先找到所符合匹配条件的人
-        sex = req.POST.get('sex') #配对性别要求
-        user = leancloud.Object.extend('_User')
-        query = user.query
-        query.equal_to('state', '2')
-        query.equal_to('sex', sex)
-        queryResult = query.find()
-
-        #todoo 今天匹配过的不重复匹配
-        startTime = OnlineTime(8)
-        chatRecord = leancloud.Object.extend('ChatRecord')
-        query2 = chatRecord.query
-        query3 = chatRecord.query
-        query2.equal_to('sid',currentUser.uid)
-        query2.greater_than_or_equal_to('startTime',startTime)
-        query3.equal_to('rid',currentUser.uid)
-        query3.greater_than_or_equal_to('startTime',startTime)
-        result = leancloud.Query.or_(query2,query3)
-        # result = query2.find()
-        #todoo 把user查询结果与聊天记录表校验，
-        rid = 0
-        for i in queryResult:
-            k = 0
-            for j in result:
-                if i.uid == j.get('sid') or i.uid == j.get('rid'):
-                    k = k + 1
-            if k == 0:
-                rid = i.uid
-                break
-
-        #没匹配到,提示没找到
-        if rid == 0:
-            print ('random_not_match')
-
-            return
-        else:
-            print ('random_match')
-            record = chatRecord()
-            record.set('sid',currentUser.uid)
-            record.set('rid',rid)
-            record.set('close','0')
+        # sex = req.POST.get('sex') #配对性别要求
+        # user = leancloud.Object.extend('_User')
+        # query = user.query
+        # query.equal_to('state', '2')
+        # query.equal_to('sex', sex)
+        # queryResult = query.find()
+        #
+        # #todoo 今天匹配过的不重复匹配
+        # startTime = OnlineTime(8)
+        # chatRecord = leancloud.Object.extend('ChatRecord')
+        # query2 = chatRecord.query
+        # query3 = chatRecord.query
+        # query2.equal_to('sid',currentUser.uid)
+        # query2.greater_than_or_equal_to('startTime',startTime)
+        # query3.equal_to('rid',currentUser.uid)
+        # query3.greater_than_or_equal_to('startTime',startTime)
+        # result = leancloud.Query.or_(query2,query3)
+        # # result = query2.find()
+        # #todoo 把user查询结果与聊天记录表校验，
+        # rid = 0
+        # for i in queryResult:
+        #     k = 0
+        #     for j in result:
+        #         if i.uid == j.get('sid') or i.uid == j.get('rid'):
+        #             k = k + 1
+        #     if k == 0:
+        #         rid = i.uid
+        #         break
+        #
+        # #没匹配到,提示没找到
+        # if rid == 0:
+        #     print ('random_not_match')
+        #
+        #     return
+        # else:
+        #     print ('random_match')
+        #     record = chatRecord()
+        #     record.set('sid',currentUser.uid)
+        #     record.set('rid',rid)
+        #     record.set('close','0')
         return
 
     #get方法
     else:
         uid = req.COOKIES.get('UID')
         my = User.objects.get(id=uid)
+        token = GetAccessToken()
 
         #查询time_login_today是否未今天，如果是就不给今天积分，如果不是就给积分，并且把时间改为今天时间
         time = my.time_login_today
@@ -129,7 +129,7 @@ def index(req):
                     start = OnlineTime(8)
                     chatRecord = Chat.objects.select_related().filter(Q(rid=uid) | Q(sid=uid), close='1',time__gt=start)
 
-                    # todoo 把user查询结果与聊天记录表校验：先找到所有""用户，然后逐个到最近对话列表里检查，取没有出现的第一个
+                    #把user查询结果与聊天记录表校验：先找到所有""用户，然后逐个到最近对话列表里检查，取没有出现的第一个
                     key = 0 #是否有
                     x = 0
                     user_chat = user[0]
@@ -159,9 +159,18 @@ def index(req):
                         user_chat.score_today = str(int(user_chat.score_today) - 1)
                         user_chat.score_sum = str(int(user_chat.score_sum) + 1)
                         user_chat.save()
+
+                        #給双方发微信推送告诉配对成功
+                        link = getUserLink(req, user_chat)
+                        resMsgA = '已匹配到 '+ user_chat.name + '，你们可以开始对话 :> \n(' + link + '的主页)'
+                        PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
+
+                        link = getUserLink(req, my)
+                        resMsgB = '已匹配到 '+ my.name + '，你们可以开始对话 :> \n(' + link + '的主页)'
+                        PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
+
                         response = HttpResponseRedirect(reverse('index'))
                         return response
-
 
                 # else:
                 #     return HttpResponse('all is busy') # 前端要效果
@@ -177,6 +186,14 @@ def index(req):
                 user_chat.state = '1'
                 user_chat.save()
                 chat.update(close='1') #一般只有1个，考虑到容错，就全部更新
+
+                #todoo 给双方发推送告诉已退出聊天
+                resMsgA = '你已退出聊天'
+                PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
+
+                resMsgB = '对方已退出聊天'
+                PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
+
             if my.state == '2':
                 my.state = '1'
                 my.save()
@@ -225,24 +242,28 @@ def index(req):
     #API方案: 前端js调用api获取数据，然后js渲染内容
 
 
+def getUserLink(req, user):
+    url = GetSiteUrl(req) + 'user/' + str(user.id)
+    link = '<a href="' + url + '">' + user.name + '</a>'
+    return link
 
 def invite(req):
+
     action = req.GET.get('action')
     uid = req.GET.get('uid')
-    if req.COOKIES.get('daqi'):
-        count = req.COOKIES.get('daqi')
-    else:
-        count = 0
-    my = User.objects.get(id=uid)
-
+    user = User.objects.get(id=uid)
+    myId = req.COOKIES.get('UID')
+    myself = 0
+    if str(uid) == myId:
+        myself = 1
     if req.method == 'POST':
-        count = int(count) + 1
-
-    content = {'my': my, 'count':count}
-    #打气
+        user.score_forever = str(int(user.score_forever) + 1)
+        user.save()
+    url_friend = GetSiteUrl(req)
+    content = {'user': user, 'myself':myself, 'url_friend':url_friend}
+    #打气 (所有判断在前端完成)
     if action == 'daqi':
         response = render(req, 'user/daqi.html', content)
-        response.set_cookie('daqi',str(count), max_age=10000000000)
         return response
 
     response = render(req, 'user/invite.html', content)
@@ -265,11 +286,11 @@ def GetUserChat(chat, uid):
 
 
 #查询某用户信息
-def getUserInfo(uid):
-    user = leancloud.Object.extend('_User')
-    query = user.query
-    my = query.get(uid)
-    return my
+# def getUserInfo(uid):
+#     user = leancloud.Object.extend('_User')
+#     query = user.query
+#     my = query.get(uid)
+#     return my
 
 
 #修改用户状态
@@ -439,11 +460,12 @@ def userProfile(req,uid):
 
 
 def my(req):
+
     uid = req.COOKIES.get('UID')
     my = User.objects.get(id=uid)
     url_info = GetSiteUrl(req) + 'user/' + uid
     url_daqi =  GetSiteUrl(req) + 'invite?action=daqi&uid=' + str(uid)
-    context = {'my': my, 'url_info':url_info, 'url_daqi':url_daqi}
+    context = {'my': my, 'url_info':url_info, 'url_daqi':url_daqi,}
     response = render(req, 'user/my.html', context)
     return response
 
@@ -496,6 +518,15 @@ class ModifyInfo(View):
         return response
 
     def get(self,req):
+        W_NAME = req.GET.get('W_NAME')
+        #微信触发带登录特性的页面
+        if W_NAME:
+            my = User.objects.get(W_NAME=W_NAME)
+            url = GetSiteUrl(req) + 'modify-info'
+            response = HttpResponseRedirect(url)
+            response.set_cookie('UID', my.id, max_age=10000000000)
+            response.set_cookie('W_NAME', W_NAME, max_age=10000000000)
+            return response
         uid = req.COOKIES.get('UID')
         my = User.objects.get(id=uid)
         imgs = UserImg.objects.filter(uid_id=uid)
@@ -513,6 +544,34 @@ def onlineUser(req):
     content = {}
     response = render(req, 'chat/online_user.html', content)
     return
+
+
+
+def GetAccessToken():
+    #如何保证token长期有效。 http://www.360doc.com/content/14/0719/14/13350344_395493590.shtml
+
+    ver = 0  #0取测试的key， 1为正式环境key
+    result = Config.objects.get(key='token', version=ver)
+    start = OnlineTimeMinutes(30)
+    if result.time > start:
+        token = result.value
+    else:
+        APPID = Config.objects.get(key='appid', version=ver).value
+        APPSECRET = Config.objects.get(key='appsecret', version=ver).value
+
+        TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + APPID + "&secret=" + APPSECRET
+        response = urllib2.urlopen(TOKEN_URL)
+        html = response.read()
+        tokeninfo = json.loads(html)
+        token = tokeninfo['access_token']
+        result.value = token
+        result.time = GetTimeNow()
+        result.save()
+    return token
+
+
+
+
 
 
 #定时器
@@ -555,7 +614,7 @@ def manageSendMessage(req):
 
 
 
-# def api_register2(req):
+def api_register2(req):
 #
 #     username = req.GET.get('username')
 #     password = req.GET.get('password')
@@ -566,7 +625,7 @@ def manageSendMessage(req):
 #     user.set_password(password)
 #     user.name = name
 #     user.sign_up()
-#     return
+    return
 
 #api 获取用户资料、喜欢、屏蔽、投诉某人等操作
 def apiUser(req,uid):
@@ -598,31 +657,31 @@ def apiChatMagic(req):
 
 
 #API 注册接口
-class API_Register(View):
-    def get(self, req):
-        username = req.GET.get('username')
-        password = req.GET.get('password')
-        name = req.GET.get('name')
-        try:
-            user = leancloud.User()
-            user.set_username(username)
-            user.set_password(password)
-            user.name = name
-            user.sign_up()
-            print (user._attributes)
-            info = user._attributes
-
-        except LeanCloudError as e:
-            return HttpResponseServerError(e)
-
-        print(leancloud.User.get_current())
-        # return HttpResponse(leancloud.User.get_current())
-        return HttpResponse(user._attributes)
-        # url = GetSiteUrl(req)
-        # return HttpResponseRedirect(url)
-
-    def post(self,req):
-        return
+# class API_Register(View):
+#     def get(self, req):
+#         username = req.GET.get('username')
+#         password = req.GET.get('password')
+#         name = req.GET.get('name')
+#         try:
+#             user = leancloud.User()
+#             user.set_username(username)
+#             user.set_password(password)
+#             user.name = name
+#             user.sign_up()
+#             print (user._attributes)
+#             info = user._attributes
+#
+#         except LeanCloudError as e:
+#             return HttpResponseServerError(e)
+#
+#         print(leancloud.User.get_current())
+#         # return HttpResponse(leancloud.User.get_current())
+#         return HttpResponse(user._attributes)
+#         # url = GetSiteUrl(req)
+#         # return HttpResponseRedirect(url)
+#
+#     def post(self,req):
+#         return
 
 
 

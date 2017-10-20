@@ -2,7 +2,7 @@ from django.conf.urls import  url
 from django.conf import settings
 from django.conf.urls.static import static
 
-from chat import views
+from chat import views,view_weixinservice
 
 urlpatterns = [
 
@@ -15,7 +15,7 @@ urlpatterns = [
     url(r'^score-desc/$', views.score_desc, ),
 
     #user, uid = objectId
-    url(r'^my/$', views.my),
+    url(r'^my/$', views.my, name='my'),
     url(r'^user/(?P<uid>.{1,50})/$', views.userProfile),
     url(r'^modify-info/$', views.ModifyInfo.as_view(), name = 'modifyInfo'),
     url(r'^online-user/$', views.onlineUser, name='onlineUser'),
@@ -39,7 +39,7 @@ urlpatterns = [
     url(r'^api/user/(?P<uid>.{1,50})/$', views.apiUser, name="api_user"),
     url(r'^api/chat_magic/$', views.apiChatMagic, name="chat_magic"),
 
-    url(r'^api/register/$', views.API_Register.as_view(), name= "api_register" ),
+    # url(r'^api/register/$', views.API_Register.as_view(), name= "api_register" ),
     url(r'^api/chat_state/$', views.apiChatState, ),
 
     #message
@@ -59,7 +59,10 @@ urlpatterns = [
     #admin
 
 
-    #
+    #weixin
+    url(r'^weixinservice/$',view_weixinservice.handleRequest, name=""),
+
+
 
 ]  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
