@@ -25,12 +25,12 @@ urlpatterns = [
     url(r'^message/(?P<rid>.{1,50})/$', views.showMessage, name='showMessage'),
 
     #manage
-    url(r'^manage/login$', views.manageLogin, name=''),
-    url(r'^manage/list-active-user$', views.manageListActiveUser, name=''),
-    url(r'^manage/user-active-data$', views.userActiveData, name=''),
-    url(r'^manage/message$', views.manageMessage, name=''),
-    url(r'^manage/addUser', views.manageAddUser, name=''),
-    url(r'^manage/send-message', views.manageSendMessage, name=''),
+    url(r'^manage/login/$', views.manageLogin, name=''),
+    url(r'^manage/list-active-user/$', views.manageListActiveUser, name=''),
+    url(r'^manage/user-active-data/$', views.userActiveData, name=''),
+    url(r'^manage/message/$', views.manageMessage, name=''),
+    url(r'^manage/addUser/', views.manageAddUser, name=''),
+    url(r'^manage/send-message/', views.manageSendMessage, name=''),
 
     #chat-api
     # url(r'^api/register2/$', views.api_register, ),

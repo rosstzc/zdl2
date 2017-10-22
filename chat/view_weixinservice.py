@@ -83,7 +83,7 @@ def checkSignature(request):
 def responseMsg(request):
     print 'responseMsg'
     #获取微信post过来的xml，若是新用户就给一个“提示登录的”逻辑， 若是老用户就再给一个逻辑。
-    rawStr = smart_str(request.raw_post_data)
+    rawStr = smart_str(request.body)
     #rawStr = smart_str(request.POST['XML'])
     msg = paraseMsgXml(ET.fromstring(rawStr))
     eventMsg = msg.get('Event')
@@ -140,7 +140,7 @@ def responseMsg(request):
             user.city = info['city']
             user.province = info['province']
             user.country = info['country']
-            user.image1.name = info['headimgurl']   # /0, 用户头像，最后一个数值代表正方形头像大小（有0、46、64、96、132数值可选，0代表640*640正方形头像）
+            # user.image1.name = info['headimgurl']   # /0, 用户头像，最后一个数值代表正方形头像大小（有0、46、64、96、132数值可选，0代表640*640正方形头像）
             # if info['unionid']:  #不能这样判断
             #     user.unionid = info['unionid']
             user.R_TIME = GetTimeNow()
@@ -507,10 +507,10 @@ def GetUserWeixinInfo(token,OPENID):
 
 
 # 这方法用于解析xml
-def paraseMsgXml(rootElem):
+def paraseMsgXml(rootelem):
     msg = {}
-    if rootElem.tag == 'xml':
-        for child in rootElem:
+    if rootelem.tag == 'xml':
+        for child in rootelem:
             msg[child.tag] = smart_str(child.text)
     return msg
 

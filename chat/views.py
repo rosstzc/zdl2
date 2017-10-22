@@ -16,7 +16,7 @@ from models import *
 from django.db.models import Q
 
 from view_func import *    #公共方法
- 
+
 
 from django.template.context import RequestContext
 # Create your views here.
@@ -88,7 +88,6 @@ def index(req):
     else:
         uid = req.COOKIES.get('UID')
         my = User.objects.get(id=uid)
-        token = GetAccessToken()
 
         #查询time_login_today是否未今天，如果是就不给今天积分，如果不是就给积分，并且把时间改为今天时间
         time = my.time_login_today
@@ -161,6 +160,7 @@ def index(req):
                         user_chat.save()
 
                         #給双方发微信推送告诉配对成功
+                        token = GetAccessToken()
                         link = getUserLink(req, user_chat)
                         resMsgA = '已匹配到 '+ user_chat.name + '，你们可以开始对话 :> \n(' + link + '的主页)'
                         PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
@@ -187,6 +187,7 @@ def index(req):
                 user_chat.save()
                 chat.update(close='1') #一般只有1个，考虑到容错，就全部更新
 
+                token = GetAccessToken()
                 #todoo 给双方发推送告诉已退出聊天
                 resMsgA = '你已退出聊天'
                 PostMessge(token, str(PostText(my.W_NAME, resMsgA)))

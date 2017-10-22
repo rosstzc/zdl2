@@ -218,5 +218,5 @@ class Config(models.Model):
 
     key = models.CharField(max_length=100,blank=True)
     value = models.CharField(max_length=1000,blank=True)
-    version =  models.SmallIntegerField(max_length=5,default=0,blank=True)  #0是测试环境，1正式环境
+    version =  models.SmallIntegerField(default=0,blank=True)  #0是测试环境，1正式环境
     time = models.CharField(max_length=100,blank=True)
