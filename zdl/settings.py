@@ -103,47 +103,47 @@ WSGI_APPLICATION = 'zdl.wsgi.application'
 
     #
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'zdl',
-        'USER':'root',
-        'PASSWORD':'lbj100200',
-        'HOST':'120.25.13.110',
-        'PORT':'3306',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'zdl',
+#         'USER':'root',
+#         'PASSWORD':'lbj100200',
+#         'HOST':'120.25.13.110',
+#         'PORT':'3306',
+#     }
+# }
 
 
 # 线上数据库的配置
 
-# if 'centos' in platform.platform():
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.mysql',
-#             'NAME': 'zdl',
-#             'USER':'root',
-#             'PASSWORD':'lbj100200',
-#             'HOST':'120.25.13.110',
-#             'PORT':'3306',
-#         }
-#     }
-# else:
-# # 本地环境
-#     # Make `python manage.py syncdb` works happy!
-#     MYSQL_HOST = ''
-#     MYSQL_PORT = ''
-#     MYSQL_USER = 'root'
-#     MYSQL_PASS = ''
-#     MYSQL_DB   = 'en2401'
-#
-#     DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#         # 'NAME': os.path.join(BASE_DIR, 'test.db'),
-#     }
-# }
+if 'centos' in platform.platform():
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'zdl',
+            'USER':'root',
+            'PASSWORD':'lbj100200',
+            'HOST':'120.25.13.110',
+            'PORT':'3306',
+        }
+    }
+else:
+# 本地环境
+    # Make `python manage.py syncdb` works happy!
+    MYSQL_HOST = ''
+    MYSQL_PORT = ''
+    MYSQL_USER = 'root'
+    MYSQL_PASS = ''
+    MYSQL_DB   = 'en2401'
+
+    DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        # 'NAME': os.path.join(BASE_DIR, 'test.db'),
+    }
+}
 
 # DATABASES = {
 #     'default': {

@@ -23,7 +23,7 @@ from django.db.models import Q
 from view_func import *    #公共方法
 import  hashlib
 
-from views import GetSiteUrl, OnlineTime, GetUserUrl, saveMessage,GetTimeNow,GetAccessToken
+from views import GetSiteUrl, OnlineTime, GetUserUrl, saveMessage,GetTimeNow
 from  view_func import PostMessge
 
 
@@ -118,7 +118,8 @@ def responseMsg(request):
     #如果存事件参数，表明是接收事件推送；表示用户注册
     if eventMsg == 'subscribe':
         print 'subscribe'
-        count = User.objects.filter(W_NAME=W_NAME).count()
+        users = User.objects.filter(W_NAME=W_NAME)
+        count = users.count()
         if count == 0:
 
             #通过接口，获取用户信息
@@ -186,20 +187,19 @@ def responseMsg(request):
 
         else:
             user = User.objects.get(W_NAME=W_NAME)
-            user.save()
+            # user.save()
             replyContent = '欢迎回到24小时英语角！点菜单:【快聊】或【找角友】找小伙伴聊英语吧'
-            uid = User.objects.get(W_NAME=W_NAME).id
             # unread = UnreadTips(request,uid)  #未读信息
             # replyContent = replyContent + unread
 
             #以小秘书名义给用户发一条欢迎私信
             temp = 'Hello, 欢迎加入口语桥大家庭，有任何疑问或想法日后可跟我聊聊喔。查看使用帮助或给我们留言可点右链接： http://m.wsq.qq.com/165500268'
-            saveMessage(request, 1, uid, temp)
+            saveMessage(request, 1, user.id, temp)
 
             # url = 'http://' + get_current_site(request).domain + '/register/' + W_NAME +'/'
             # replyContent = '欢迎进入24小时英语角，随时找人练口语、结伴学英语。点链接<a href="' +str(url) + '">花10秒完善资料后进入英语角！</a>   （注：链接是你进入英语角凭证，切勿转发给TA人）'
             #     return getReplyXml(msg,replyContent)
-            url = GetSiteUrl(request) + 'index/' + '?W_NAME=' + user.W_NAME
+            url = GetSiteUrl(request) + '?W_NAME=' + user.W_NAME
             temp =  GetImageTextXML2(msg,
                                      '点我刷新登录',
                                      '',
@@ -268,7 +268,7 @@ def responseMsg(request):
 
         #点自定义菜单 消息
         if eventMsg == 'CLICK' and eventKey == 'message':
-            url = reverse('showMessage') + '?W_NAME=' + user.W_NAME
+            url = reverse('chatList') + '?W_NAME=' + user.W_NAME
             replyContent = '查看消息'
             temp = GetImageTextXML2(msg,
                                     '查看消息',

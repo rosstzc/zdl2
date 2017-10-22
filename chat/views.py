@@ -86,6 +86,17 @@ def index(req):
 
     #get方法
     else:
+        #微信触发带登录特性的页面
+        W_NAME = req.GET.get('W_NAME')
+        if W_NAME:
+            my = User.objects.get(W_NAME=W_NAME)
+            url = GetSiteUrl(req)
+            response = HttpResponseRedirect(url)
+            response.set_cookie('UID', my.id, max_age=10000000000)
+            response.set_cookie('W_NAME', W_NAME, max_age=10000000000)
+            return response
+
+
         uid = req.COOKIES.get('UID')
         my = User.objects.get(id=uid)
 
@@ -367,6 +378,17 @@ class Login(View):
 
 #类似与以前的showInbox，
 def chatList(req):
+
+    # 微信触发带登录特性的页面
+    W_NAME = req.GET.get('W_NAME')
+    if W_NAME:
+        my = User.objects.get(W_NAME=W_NAME)
+        url = GetSiteUrl(req) + 'chat-list/'
+        response = HttpResponseRedirect(url)
+        response.set_cookie('UID', my.id, max_age=10000000000)
+        response.set_cookie('W_NAME', W_NAME, max_age=10000000000)
+        return response
+
     uid = req.COOKIES.get('UID')
     #todoo 以前是每次发信都要刷新inbox表，比较浪费资源。。优化：访问该页时才刷新最近那一条对话信息 （还是不行，要循环50次）
 
@@ -378,8 +400,8 @@ def chatList(req):
         # urls.append(a)
         chats.append({'i':i, 'url':a})
 
-
-    context = {'chatList': chats}
+    url_site = GetSiteUrl(req)
+    context = {'chatList': chats, 'url_site':url_site}
     response = render(req, 'message/chat_list.html', context)
     return response
 
@@ -461,12 +483,22 @@ def userProfile(req,uid):
 
 
 def my(req):
+    # 微信触发带登录特性的页面
+    W_NAME = req.GET.get('W_NAME')
+    if W_NAME:
+        my = User.objects.get(W_NAME=W_NAME)
+        url = GetSiteUrl(req) + 'my/'
+        response = HttpResponseRedirect(url)
+        response.set_cookie('UID', my.id, max_age=10000000000)
+        response.set_cookie('W_NAME', W_NAME, max_age=10000000000)
+        return response
 
     uid = req.COOKIES.get('UID')
     my = User.objects.get(id=uid)
+    url_site = GetSiteUrl(req)
     url_info = GetSiteUrl(req) + 'user/' + uid
     url_daqi =  GetSiteUrl(req) + 'invite?action=daqi&uid=' + str(uid)
-    context = {'my': my, 'url_info':url_info, 'url_daqi':url_daqi,}
+    context = {'my': my, 'url_info':url_info, 'url_daqi':url_daqi, 'url_site':url_site}
     response = render(req, 'user/my.html', context)
     return response
 
@@ -518,6 +550,7 @@ class ModifyInfo(View):
         response = HttpResponseRedirect(url)
         return response
 
+
     def get(self,req):
         W_NAME = req.GET.get('W_NAME')
         #微信触发带登录特性的页面
@@ -548,27 +581,6 @@ def onlineUser(req):
 
 
 
-def GetAccessToken():
-    #如何保证token长期有效。 http://www.360doc.com/content/14/0719/14/13350344_395493590.shtml
-
-    ver = 0  #0取测试的key， 1为正式环境key
-    result = Config.objects.get(key='token', version=ver)
-    start = OnlineTimeMinutes(30)
-    if result.time > start:
-        token = result.value
-    else:
-        APPID = Config.objects.get(key='appid', version=ver).value
-        APPSECRET = Config.objects.get(key='appsecret', version=ver).value
-
-        TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + APPID + "&secret=" + APPSECRET
-        response = urllib2.urlopen(TOKEN_URL)
-        html = response.read()
-        tokeninfo = json.loads(html)
-        token = tokeninfo['access_token']
-        result.value = token
-        result.time = GetTimeNow()
-        result.save()
-    return token
 
 
 

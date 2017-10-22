@@ -5,10 +5,36 @@ from django.contrib.sites.shortcuts import get_current_site
 import  datetime
 import urllib,time,hashlib, json
 import urllib,urllib2,time,hashlib, json
+from models import *
 
 
 
 import sys
+
+
+def GetAccessToken():
+    #如何保证token长期有效。 http://www.360doc.com/content/14/0719/14/13350344_395493590.shtml
+
+    ver = 0  #0取测试的key， 1为正式环境key
+    result = Config.objects.get(key='token', version=ver)
+    start = OnlineTimeMinutes(30)
+    if result.time > start:
+        token = result.value
+    else:
+        APPID = Config.objects.get(key='appid', version=ver).value
+        APPSECRET = Config.objects.get(key='appsecret', version=ver).value
+
+        TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=" + APPID + "&secret=" + APPSECRET
+        response = urllib2.urlopen(TOKEN_URL)
+        html = response.read()
+        tokeninfo = json.loads(html)
+        token = tokeninfo['access_token']
+        result.value = token
+        result.time = GetTimeNow()
+        result.save()
+    return token
+
+
 
 
 def GetSiteUrl(req):
