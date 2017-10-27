@@ -17,7 +17,7 @@ urlpatterns = [
     #user, uid = objectId
     url(r'^my/$', views.my, name='my'),
     url(r'^user/(?P<uid>.{1,50})/$', views.userProfile),
-    url(r'^modify-info/$', views.ModifyInfo.as_view(), name = 'modifyInfo'),
+    url(r'^modify-info/$', views.modifyInfo, name = 'modifyInfo'),
     url(r'^online-user/$', views.onlineUser, name='onlineUser'),
 
     #message

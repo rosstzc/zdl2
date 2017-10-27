@@ -150,6 +150,8 @@ class UserImg(models.Model):
     uid = models.ForeignKey(User, related_name='uid_img')
     imgData = models.TextField(blank=True)
     time = models.CharField(max_length=100,blank=True)
+    image = models.FileField(upload_to='fig/', blank=True)
+
 
 
 

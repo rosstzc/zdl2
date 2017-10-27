@@ -23,6 +23,8 @@ from django.db.models import Q
 from view_func import *    #公共方法
 import  hashlib
 
+
+
 from views import GetSiteUrl, OnlineTime, GetUserUrl, saveMessage,GetTimeNow
 from  view_func import PostMessge
 
@@ -33,8 +35,6 @@ sys.setdefaultencoding('utf8')
 
 
 TOKEN = "zdl"
-
-
 
 
 @csrf_exempt
@@ -141,7 +141,7 @@ def responseMsg(request):
             user.city = info['city']
             user.province = info['province']
             user.country = info['country']
-            # user.image1.name = info['headimgurl']   # /0, 用户头像，最后一个数值代表正方形头像大小（有0、46、64、96、132数值可选，0代表640*640正方形头像）
+            user.image_url = info['headimgurl']   # /0, 用户头像，最后一个数值代表正方形头像大小（有0、46、64、96、132数值可选，0代表640*640正方形头像）
             # if info['unionid']:  #不能这样判断
             #     user.unionid = info['unionid']
             user.R_TIME = GetTimeNow()
@@ -233,8 +233,6 @@ def responseMsg(request):
 
         #一开始先刷新用户的状态时间
         user = User.objects.filter(W_NAME=W_NAME)
-
-
         #插入一个异常处理，用户数据有错
         if user.count() != 1:
 
@@ -246,11 +244,11 @@ def responseMsg(request):
             # message.save()
             replyContent = '出了点错误，请你联系管理员处理，管理员微信号：zhichao'
             return getReplyXml(msg,replyContent)
-
+        user = user[0]
 
         #点自定义菜单 快聊
         if eventMsg == 'CLICK' and eventKey == 'chat':
-            url = reverse('index') + '?W_NAME=' + user.W_NAME
+            url = GetSiteUrl(request) + '?W_NAME=' + user.W_NAME
             replyContent = '点我登录'
             temp = GetImageTextXML2(msg,
                                     '点我登录',
@@ -268,7 +266,7 @@ def responseMsg(request):
 
         #点自定义菜单 消息
         if eventMsg == 'CLICK' and eventKey == 'message':
-            url = reverse('chatList') + '?W_NAME=' + user.W_NAME
+            url =  GetSiteUrl(request)+ 'chat-list/' + '?W_NAME=' + user.W_NAME
             replyContent = '查看消息'
             temp = GetImageTextXML2(msg,
                                     '查看消息',
@@ -284,7 +282,7 @@ def responseMsg(request):
             return temp
         #点自定义菜单 我的
         if eventMsg == 'CLICK' and eventKey == 'my':
-            url = reverse('my') + '?W_NAME=' + user.W_NAME
+            url = GetSiteUrl(request)+ 'my' + '?W_NAME=' + user.W_NAME
             replyContent = '查看我的'
             temp = GetImageTextXML2(msg,
                                     '查看我的',

@@ -14,6 +14,8 @@ from django.shortcuts import render
 from django.views.generic import View  #通用类
 from models import *
 from django.db.models import Q
+from django.views.decorators.csrf import csrf_exempt
+
 
 from view_func import *    #公共方法
 
@@ -26,6 +28,7 @@ from django.template.context import RequestContext
 # from leancloud import Query
 # from leancloud.errors import LeanCloudError
 
+import base64,os
 import logging
 import json
 logging.basicConfig(level=logging.DEBUG)
@@ -466,9 +469,12 @@ def saveMessage(req, sid, rid, msg):
 def userProfile(req,uid):
     user = User.objects.get(id=uid)
     imgs = UserImg.objects.filter(uid_id=uid)
+    for i in imgs:
+        i.image.name = GetSiteUrl(req) + 'media/' + i.image.name
     count = imgs.count()
     my_uid = req.COOKIES.get('UID')
-    url_avatar = GetSiteUrl(req) + 'media/' + user.image1.name
+    # url_avatar = GetSiteUrl(req) + 'media/' + user.image1.name
+    url_avatar = user.image_url
     myself = '0' #不是本人
     if my_uid == uid:
         myself = '1'
@@ -503,9 +509,9 @@ def my(req):
     return response
 
 
-class ModifyInfo(View):
-    def post(self,req):
-
+@csrf_exempt
+def modifyInfo(req):
+    if req.method == 'POST':
         uid = req.COOKIES.get('UID')
         my = User.objects.get(id=uid)
 
@@ -517,23 +523,28 @@ class ModifyInfo(View):
             my.image1 = avatar
             my.image1.name = 'avatar' + str(uid) + '.jpg'
             my.save()
+            my.image_url = GetSiteUrl(req) + 'media/' + my.image1.name
+            my.save()
             return HttpResponse('1')
+
 
         #删除图片
-        delete_img = req.POST.get('delete_img')
-        if delete_img != ' ':
+        delete_img = req.POST.get('delete_img')  #
+        if delete_img != None :
             result = UserImg.objects.filter(uid_id=uid)
-            temp = result.count()
+            result[int(delete_img)].image.delete()
             result[int(delete_img)].delete()
 
-        # 异步更新图片
-        imgData = req.POST.get('base64')
-        if imgData == ' ':
-            print ('没有上传图片')
         else:
-            img = UserImg(uid_id=uid, imgData=imgData, time=GetTimeNow())
-            img.save()
-            return HttpResponse('1')
+            # 异步更新图片
+            # imgData = req.POST.get('base64')
+            image = req.FILES.get('fileVal')
+            if image == ' ':
+                print ('no photo save')
+            else:
+                img = UserImg(uid_id=uid, image=image, time=GetTimeNow())
+                img.save()
+                return HttpResponse('1')
 
 
         #todoo
@@ -551,7 +562,7 @@ class ModifyInfo(View):
         return response
 
 
-    def get(self,req):
+    else:
         W_NAME = req.GET.get('W_NAME')
         #微信触发带登录特性的页面
         if W_NAME:
@@ -564,6 +575,8 @@ class ModifyInfo(View):
         uid = req.COOKIES.get('UID')
         my = User.objects.get(id=uid)
         imgs = UserImg.objects.filter(uid_id=uid)
+        for i in imgs:
+            i.image.name = GetSiteUrl(req) + 'media/' + i.image.name
         content = {
             'my': my,
             'imgs':imgs,
