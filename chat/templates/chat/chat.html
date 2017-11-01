@@ -168,9 +168,17 @@
             <img src="{{ url_site }}media/icon/icons8-Lightning Bolt_2.png" alt="" class="weui-tabbar__icon">
             <p class="weui-tabbar__label">快聊</p>
         </a>
+
+
         <a href="{{ url_site }}chat-list/" class="weui-tabbar__item">
-            <img src="{{ url_site }}media/icon/icons8-Comments Filled.png" alt="" class="weui-tabbar__icon">
+            <span style="display: inline-block;position: relative;">
+                <img src="{{ url_site }}media/icon/icons8-Comments Filled.png" alt="" class="weui-tabbar__icon">
+                {% if unreadSum != 0 %}
+                <span class="weui-badge" style="position: absolute;top: -2px;right: -13px;">{{ unreadSum }}</span>
+                {% endif %}
+            </span>
             <p class="weui-tabbar__label">消息</p>
+
         </a>
         <a href="{{ url_site }}my/" class="weui-tabbar__item">
             <img src="{{ url_site }}media/icon/icons8-User.png" alt="" class="weui-tabbar__icon">

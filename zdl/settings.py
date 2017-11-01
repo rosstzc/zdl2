@@ -62,8 +62,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'chat'
+    'chat',
+    'django_crontab', #定时任务
+
 ]
+
+#定时任务
+CRONJOBS = [
+    # ('*/1 * * * *', 'chat.cron.test', '>>/home/test.log')
+    # ('*/1 * * * * sleep 10', 'chat.cron.test', '>>/home/test.log')
+    # ('*/1 * * * *', 'zdl.chat.cron.test')
+    ('*/1 * * * * sleep 10', 'chat.cron.test'),  # not work
+    ('*/1 * * * *', 'chat.cron.test'),
+    ('*/1 * * * *', 'chat.views.timer'),    #not work
+]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

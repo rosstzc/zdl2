@@ -25,7 +25,9 @@ urlpatterns = [
     url(r'^message/(?P<rid>.{1,50})/$', views.showMessage, name='showMessage'),
 
     #manage
+
     url(r'^manage/login/$', views.manageLogin, name=''),
+    url(r'^manage/timer/$', views.timer, name=''),
     url(r'^manage/list-active-user/$', views.manageListActiveUser, name=''),
     url(r'^manage/user-active-data/$', views.userActiveData, name=''),
     url(r'^manage/message/$', views.manageMessage, name=''),

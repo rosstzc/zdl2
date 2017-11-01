@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
+# from __future__ import unicode_literals
 
 
 from datetime import datetime
@@ -18,7 +18,9 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 from view_func import *    #公共方法
-
+# from apscheduler.schedulers.background import BackgroundScheduler
+#
+# from apscheduler.schedulers.blocking import BlockingScheduler
 
 from django.template.context import RequestContext
 # Create your views here.
@@ -31,6 +33,8 @@ from django.template.context import RequestContext
 import base64,os
 import logging
 import json
+import  datetime
+
 logging.basicConfig(level=logging.DEBUG)
 
 from django.template.loader import get_template
@@ -105,11 +109,14 @@ def index(req):
 
         #查询time_login_today是否未今天，如果是就不给今天积分，如果不是就给积分，并且把时间改为今天时间
         time = my.time_login_today
+        date_time = datetime.datetime.strptime(time,'%Y-%m-%d %H:%M:%S')
+        time_string = datetime.datetime.strftime(date_time,'%Y-%m-%d')
         now = datetime.datetime.now()
         DATETIME_FORMAT = '%Y-%m-%d'
         today_string = now.strftime(DATETIME_FORMAT)
-        if  time != today_string :
-            my.time_login_today = today_string
+        if  time_string != today_string :
+            # my.time_login_today = today_string
+            my.time_login_today = GetTimeNow()
             my.score_today = '30'
             if my.sex == '0':
                 my.score_today = '50'
@@ -233,9 +240,10 @@ def index(req):
         url_site = GetSiteUrl(req)
         url_gochat = GetSiteUrl(req) + '?action=gochat'
         url_leave = GetSiteUrl(req) + '?action=leave'
+        unreadSum = getUnreadSum(req)
         content = {'my': my, 'user_chat':user_chat, 'state':my.state,
                    'url_gochat':url_gochat, 'url_leave':url_leave, 'url_info':url_info, 'url_site':url_site,
-                   'score_available':score_aviable}
+                   'score_available':score_aviable, 'unreadSum':unreadSum}
         response = render(req, 'chat/chat.html', content)
         return response
 
@@ -379,9 +387,15 @@ class Login(View):
     #                               RequestContext(req, {}))
 
 
+
+def getUnreadSum(req):
+    uid = req.COOKIES.get('UID')
+    unread = Message.objects.filter(rid_id=uid, read_not=0).count()
+    return unread
+
+
 #类似与以前的showInbox，
 def chatList(req):
-
     # 微信触发带登录特性的页面
     W_NAME = req.GET.get('W_NAME')
     if W_NAME:
@@ -404,7 +418,8 @@ def chatList(req):
         chats.append({'i':i, 'url':a})
 
     url_site = GetSiteUrl(req)
-    context = {'chatList': chats, 'url_site':url_site}
+    unreadSum = getUnreadSum(req)
+    context = {'chatList': chats, 'url_site':url_site, 'unreadSum':unreadSum}
     response = render(req, 'message/chat_list.html', context)
     return response
 
@@ -427,6 +442,12 @@ def showMessage(req,rid):
 
 
     else:
+        #delete unread count
+        message = Message.objects.filter(sid_id=rid, rid_id=uid, read_not='0')
+        message.update(read_not=1)
+        chatList = ChatList.objects.filter(sid_id=rid, rid_id=uid)
+        chatList.update(unread=0)
+
         #对方名字
         userbName = User.objects.get(id=rid).name
         userbUrl = GetUserUrl(req, rid)
@@ -462,7 +483,7 @@ def saveMessage(req, sid, rid, msg):
     chat = ChatList(sid_id=sid, rid_id=rid, unread=unread, content=msg, time=GetTimeNow())
     chat.save()
     #反过来再插入一条
-    chat = ChatList(sid_id=rid, rid_id=sid, unread=unread, content=msg, time=GetTimeNow())
+    chat = ChatList(sid_id=rid, rid_id=sid, content=msg, time=GetTimeNow())
     chat.save()
 
 
@@ -504,7 +525,8 @@ def my(req):
     url_site = GetSiteUrl(req)
     url_info = GetSiteUrl(req) + 'user/' + uid
     url_daqi =  GetSiteUrl(req) + 'invite?action=daqi&uid=' + str(uid)
-    context = {'my': my, 'url_info':url_info, 'url_daqi':url_daqi, 'url_site':url_site}
+    unreadSum = getUnreadSum(req)
+    context = {'my': my, 'url_info':url_info, 'url_daqi':url_daqi, 'url_site':url_site, 'unreadSum':unreadSum}
     response = render(req, 'user/my.html', context)
     return response
 
@@ -517,11 +539,11 @@ def modifyInfo(req):
 
         #更新头像
         avatar_key = req.POST.get('avatar_key','')
-        if avatar_key == '1':
+        avatar = req.FILES.get('avatar')
+        if avatar != None:
             my.image1.delete()  #先删除原来头像
-            avatar = req.FILES['avatar']
             my.image1 = avatar
-            my.image1.name = 'avatar' + str(uid) + '.jpg'
+            my.image1.name = 'avatar-' + str(uid) + '.jpg'
             my.save()
             my.image_url = GetSiteUrl(req) + 'media/' + my.image1.name
             my.save()
@@ -529,8 +551,8 @@ def modifyInfo(req):
 
 
         #删除图片
-        delete_img = req.POST.get('delete_img')  #
-        if delete_img != None :
+        delete_img = req.POST.get('delete_img','x')  #
+        if delete_img != 'x' :
             result = UserImg.objects.filter(uid_id=uid)
             result[int(delete_img)].image.delete()
             result[int(delete_img)].delete()
@@ -539,7 +561,7 @@ def modifyInfo(req):
             # 异步更新图片
             # imgData = req.POST.get('base64')
             image = req.FILES.get('fileVal')
-            if image == ' ':
+            if image == None:
                 print ('no photo save')
             else:
                 img = UserImg(uid_id=uid, image=image, time=GetTimeNow())
@@ -586,6 +608,72 @@ def modifyInfo(req):
         return response
 
 
+
+# #每小时处理一下未读信息，把最近48小的未读信息总数同步到user表，user表的数据仅用作推送使用
+# def updateUserUnread():
+#     chat = ChatList.objects.select_related().filter(time__gt=OnlineTime(48)).exclude(unread=0)
+#     if chat.count() > 0:
+#         for i in chat:
+#             user = i.rid
+#             user.unread =
+
+
+
+#9：00、9：01触发未读提醒，只查询最近两天未读消息量。 （先触发这个10次，再触发下一个方法10次）
+def unreadReminder():
+    token = GetAccessToken()
+    chat = ChatList.objects.select_related().filter(time__gt=OnlineTime(48)).exclude(unread=0)
+    if chat.count() > 0:
+        temp = [chat[0].rid]
+        for i in chat:
+            user = i.rid
+            for j in temp:
+                if j.id == user.id:
+                    break
+                else:
+                    temp.append(user)
+        for i in temp:
+            text = '你有未读留言，有请查看'
+            PostMessge(token, str(PostText(i.W_NAME, text)))
+            i.remind_time = GetTimeNow()
+            i.save()
+    return
+
+
+
+#9：00、9：01触发聊天邀请提醒（没有未读的用户）
+def chatReminder():
+    # 如果remind_time是今天9点以前的，然后给他们推送
+    users = User.objects.filter(remind_time__lt=OnlineTime(4))
+    token = GetAccessToken()
+    if users.count() > 0:
+        for i in users:
+            text = '晚上好，在"九点聊天"等你，说出你的故事'
+            PostMessge(token, str(PostText(i.W_NAME, text)))
+            i.remind_time = GetTimeNow()
+            i.save()
+    return
+
+
+
+#服务超时提醒,每小时检查一次
+def serviceRemind():
+    token = GetAccessToken()
+    start1 = OnlineTime(48)
+    start2 = OnlineTime(36)
+    hour = datetime.datetime.now().strftime("%H")
+    if int(hour) == 12 or  int(hour) == 17 or  int(hour) == 18 or  int(hour) == 19 or int(hour) == 20 or int(hour) == 21:
+        result = User.objects.filter(time_login_today__gt=start1, time_login_today__lt=start2, remind_key="0")
+        for i in result:
+            msgContent = '温馨提醒：由于微信48小时响应限制，你将在2小时后无法收到我们的通知。\n如果你想继续收到通知，请点【进入】菜单一次，以刷新状态。'
+            msgContent = PostFormat(msgContent)
+            PostMessge(token, str(PostText(i.uid.W_NAME, msgContent)))
+
+            i.remind_key = "1"
+            i.save()
+    return HttpResponse('1')
+
+
 #查询在线用户
 def onlineUser(req):
     content = {}
@@ -593,17 +681,54 @@ def onlineUser(req):
     return
 
 
-
-
-
-
-
-
-
 #定时器
 def timer(req):
-    #定时触发，更新所有人的在线状态
-    return
+    unreadReminder()
+    chatReminder()
+    serviceRemind()
+    user = User(username='333')
+    user.save()
+    return HttpResponse('1')
+
+
+
+
+def tick2():
+    print('Tick! The time is: %s' % datetime.datetime.now())
+
+
+# if __name__ == '__main__':
+#     scheduler = BackgroundScheduler()
+#     scheduler.add_job(timer, 'interval', seconds=3)
+#     # scheduler.add_job(tick2, 'cron', second='*/3', hour='*')
+#     scheduler.start()
+#     print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
+#
+#     try:
+#         # This is here to simulate application activity (which keeps the main thread alive).
+#         while True:
+#             time.sleep(2)
+#             print('sleep!')
+#     except (KeyboardInterrupt, SystemExit):
+#         scheduler.shutdown()  # Not strictly necessary if daemonic mode is enabled but should be done if possible
+#         print('Exit The Job!')
+
+
+def tick():
+    print('Tick! The time is: %s' % datetime.datetime.now())
+
+
+# if __name__ == '__main__':
+#     scheduler = BlockingScheduler()
+#     scheduler.add_job(tick, 'cron', second='*/3', hour='*')
+#     print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
+#
+#     try:
+#         scheduler.start()
+#     except (KeyboardInterrupt, SystemExit):
+#         scheduler.shutdown()
+
+
 
 
 #修改图片时，异步保存到数据库

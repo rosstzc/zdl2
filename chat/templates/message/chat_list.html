@@ -33,31 +33,46 @@
     <div class="weui-panel weui-panel_access">
         <div class="weui-panel__hd">聊过的</div>
 
-        <div class="weui-panel__bd">
         {% for i in chatList %}
-            <a href=" {{ i.url }}" class="weui-media-box weui-media-box_appmsg">
-                <div class="weui-media-box__hd">
-                    <img class="weui-media-box__thumb" src="/media/{{ i.i.sid.image1 }}" alt="">
+        <a href=" {{ i.url }}" class="">
+            <div class="weui-cell">
+                <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
+                    <img src="/media/{{ i.i.sid.image1 }}" style="width: 50px;height: 50px;display: block">
+                    {% if i.i.unread != 0 %}
+                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
+                    {% endif %}
                 </div>
-                <div class="weui-media-box__bd">
-                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
-                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
-                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
+                <div class="weui-cell__bd">
+                    <p>{{ i.i.sid.name }}</p>
+                    <p style="font-size: 13px;color: #888888;">{{ i.i.content }}</p>
+                    <p style="font-size: 13px;color: #888888;">{{ i.i.time }}</p>
                 </div>
+                <div class="weui-cell__ft">></div>
+            </div>
+        </a>
 
-            </a>
         {% endfor %}
-        </div>
+
     </div>
+
+
+
+
 
    <div class="weui-tabbar">
         <a href="{{ url_site }}" class="weui-tabbar__item">
             <img src="{{ url_site }}media/icon/icons8-Lightning Bolt_2.png" alt="" class="weui-tabbar__icon">
             <p class="weui-tabbar__label">快聊</p>
         </a>
-        <a href="{{ url_site }}chat-list/" class="weui-tabbar__item weui-bar__item_on">
-            <img src="{{ url_site }}media/icon/icons8-Comments Filled.png" alt="" class="weui-tabbar__icon">
+        <a href="{{ url_site }}chat-list/" class="weui-tabbar__item">
+            <span style="display: inline-block;position: relative;">
+                <img src="{{ url_site }}media/icon/icons8-Comments Filled.png" alt="" class="weui-tabbar__icon">
+                {% if unreadSum != 0 %}
+                <span class="weui-badge" style="position: absolute;top: -2px;right: -13px;">{{ unreadSum }}</span>
+                {% endif %}
+            </span>
             <p class="weui-tabbar__label">消息</p>
+
         </a>
         <a href="{{ url_site }}my/" class="weui-tabbar__item">
             <img src="{{ url_site }}media/icon/icons8-User.png" alt="" class="weui-tabbar__icon">

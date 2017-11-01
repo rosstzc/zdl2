@@ -138,38 +138,32 @@
 			var maxCount = 6;
 
 			//刷新头像
-			$('#avatar').on('change',function (event) {
-
-			    avatar_form = $("#avatar_form");
-			    avatar_key = $("#avatar_key");
-			    avatar_key.val('1');
-			    avatar_form.ajaxSubmit({
-                    success: function(data) {
-                        if (data === '1') {
+{#			$('#avatar').on('change',function (event) {#}
+{##}
+{#			    avatar_form = $("#avatar_form");#}
+{#			    avatar_key = $("#avatar_key");#}
+{#			    avatar_key.val('1');#}
+{#			    avatar_form.ajaxSubmit({#}
+{#                    success: function(data) {#}
+{#                        if (data === '1') {#}
 {#			     		    alert('yy');#}
-                            window.location.reload();
-                        }
-                    }
-                });
-                event.stopPropagation();
-			    $('#avatar').val('');
-			    avatar_key.val('');
-            });
-
-
-
-
-			//微信官方upload的js
-            var uploadCount = 0;
-            weui.uploader('#uploader', {
-               url: 'http://127.0.0.1:8000/modify-info/',
+{#                            window.location.reload();#}
+{#                        }#}
+{#                    }#}
+{#                });#}
+{#                event.stopPropagation();#}
+{#			    $('#avatar').val('');#}
+{#			    avatar_key.val('');#}
+{#            });#}
+            weui.uploader('#avatar_form', {
+               url: '',
                auto: true,
                type: 'file',
-               fileVal: 'fileVal',
+               fileVal: 'avatar',
                compress: {
                    width: 1600,
                    height: 1600,
-                   quality: .8
+                   quality: .5
                },
                onBeforeQueued: function(files) {
                    // `this` 是轮询到的文件, `files` 是所有文件
@@ -212,12 +206,125 @@
                    // $.extend(headers, { Origin: 'http://127.0.0.1' }); // 可以扩展此对象来控制上传头部
 
                    // return false; // 阻止文件上传
+
+
                },
+                onProgress: function(procent){
+{#                   alert('33');#}
+                   console.log(this, procent);
+                   // return true; // 阻止默认行为，不使用默认的进度显示
+                   $loadingToast = $('#loadingToast');
+                   if ($loadingToast.css('display') !== 'none') return;
+
+                        $loadingToast.fadeIn(100);
+{#                        setTimeout(function () {#}
+{#                            $loadingToast.fadeOut(100);#}
+{#                        }, 2000);#}
+                    },
+               onSuccess: function (ret) {
+                   $loadingToast.fadeOut(100);
+                   window.location.reload();
+
+{#                   alert('5555');#}
+                   console.log(this, ret);
+                   // return true; // 阻止默认行为，不使用默认的成功态
+               },
+               onError: function(err){
+                   console.log(this, err);
+                   // return true; // 阻止默认行为，不使用默认的失败态
+               }
+            });
+
+
+
+
+
+
+
+
+
+            $('#uploaderInput').click(function () {
+{#                                alert('999');#}
+
+            if ($('.weui-uploader__file').length >= maxCount) {
+{# 						$.weui.alert({#}
+{# 							text : '最多只能上传' + maxCount + '张图片'#}
+{# 						});#}
+                alert('最多只能上传' + maxCount + '张照片');
+                return false;
+            }
+            });
+
+
+
+			//微信官方upload的js
+            var uploadCount = 0;
+            weui.uploader('#uploader', {
+               url: '',
+               auto: true,
+               type: 'file',
+               fileVal: 'fileVal',
+               compress: {
+                   width: 1600,
+                   height: 1600,
+                   quality: .3
+               },
+               onBeforeQueued: function(files) {
+                   // `this` 是轮询到的文件, `files` 是所有文件
+
+                   if(["image/jpg", "image/jpeg", "image/png", "image/gif"].indexOf(this.type) < 0){
+                       weui.alert('请上传图片');
+                       return false; // 阻止文件添加
+                   }
+                   if(this.size > 10 * 1024 * 1024){
+                       weui.alert('请上传不超过10M的图片');
+                       return false;
+                   }
+                   if (files.length > 5) { // 防止一下子选择过多文件
+                       weui.alert('最多只能上传5张图片，请重新选择');
+                       return false;
+                   }
+                   if (uploadCount + 1 > 5) {
+                       weui.alert('最多只能上传5张图片');
+                       return false;
+                   }
+
+                   ++uploadCount;
+
+                   // return true; // 阻止默认行为，不插入预览图的框架
+               },
+               onQueued: function(){
+                   console.log(this);
+
+                   // console.log(this.status); // 文件的状态：'ready', 'progress', 'success', 'fail'
+                   // console.log(this.base64); // 如果是base64上传，file.base64可以获得文件的base64
+
+                   // this.upload(); // 如果是手动上传，这里可以通过调用upload来实现；也可以用它来实现重传。
+                   // this.stop(); // 中断上传
+
+                   // return true; // 阻止默认行为，不显示预览图的图像
+               },
+               onBeforeSend: function(data, headers){
+                   console.log(this, data, headers);
+                   // $.extend(data, { test: 1 }); // 可以扩展此对象来控制上传参数
+                   // $.extend(headers, { Origin: 'http://127.0.0.1' }); // 可以扩展此对象来控制上传头部
+                   // return false; // 阻止文件上传
+               },
+
                onProgress: function(procent){
                    console.log(this, procent);
                    // return true; // 阻止默认行为，不使用默认的进度显示
-               },
+                   $loadingToast = $('#loadingToast');
+                   if ($loadingToast.css('display') !== 'none') return;
+
+                        $loadingToast.fadeIn(100);
+{#                        setTimeout(function () {#}
+{#                            $loadingToast.fadeOut(100);#}
+{#                        }, 2000);#}
+                    },
                onSuccess: function (ret) {
+                   $loadingToast.fadeOut(100);
+{#                   alert('5555');#}
                    console.log(this, ret);
                    // return true; // 阻止默认行为，不使用默认的成功态
                },
@@ -234,8 +341,6 @@
             //刷新相册
 			$('.js_file').on('change', function(event) {
 				var files = event.target.files;
-
-
 
 				// 如果没有选中文件，直接返回
 				if (files.length === 0) {
@@ -258,13 +363,7 @@
  						});
  						continue;
  					}
- 					if ($('.weui-uploader__file').length >= maxCount) {
-{# 						$.weui.alert({#}
-{# 							text : '最多只能上传' + maxCount + '张图片'#}
-{# 						});#}
- 						alert('最多只能上传' + maxCount + '张照片');
- 						return;
- 					}
+
 					reader.onload = function(e) {
 						var img = new Image();
 						img.onload = function() {
@@ -292,8 +391,8 @@
 
 
 							//异步post图片到后台,by mike
-                            $base64 = $('#base64');
-                            $base64.val(base64);
+{#                            $base64 = $('#base64');#}
+{#                            $base64.val(base64);#}
 {#                            $("#summit_form").ajaxSubmit({});#}
 {#                            $("#summit_form").ajaxSubmit({#}
 {#                                success:function(data,textStatus){#}
@@ -311,7 +410,7 @@
 							var progress = 0;
 							function uploading() {
 								$preview.find('.weui-uploader__file-content').text(++progress + '%');
-								if (progress < 100) {
+								if (progress < 80) {
 									setTimeout(uploading, 30);
 
 								} else {
@@ -325,8 +424,10 @@
 							setTimeout(uploading, 30);
 						};
 						img.src = e.target.result;
+
 					};
 					reader.readAsDataURL(file);
+
 				}
 			});
 
@@ -402,7 +503,7 @@
                     <div class="weui-media-box__bd">
                         <h4 class="weui-media-box__title">头像</h4>
 
-            <div><input type="file" id="avatar" name="avatar"  calss="" /></div>
+            <div><input type="file" id="avatar" name="a"  calss="" /></div>
             <div><input type="hidden" id="avatar_key" name="avatar_key" value=""  /></div>
 
 {#                        <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>#}
@@ -458,7 +559,7 @@
 
         <!-- 隐藏标标签来传递数据 -->
 {#        <input class="weui-input" type="hidden"  value=" " name="base64" id="base64" placeholder=""/>#}
-        <input class="weui-input" type="hidden"  value=" " name="delete_img" id="delete_img" placeholder=""/>
+        <input class="weui-input" type="hidden"  value="x" name="delete_img" id="delete_img" placeholder=""/>
 
         <div class="weui-cells__title">资料</div>
         <div class="weui-cells weui-cells_form">
@@ -534,6 +635,17 @@
             </div>
         </div>
     </div>
+
+
+        <!-- loading toast -->
+    <div id="loadingToast" style="display:none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-loading weui-icon_toast"></i>
+            <p class="weui-toast__content">数据加载中</p>
+        </div>
+    </div>
+
 
 <!--
 <script type="text/javascript">
