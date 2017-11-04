@@ -458,7 +458,7 @@ def CustomMenu(request,para):
                   "name":"我的",
                   "key":"my"
                },
-                ]
+                ] 
          }
 
 
