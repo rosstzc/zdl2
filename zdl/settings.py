@@ -72,9 +72,22 @@ CRONJOBS = [
     # ('*/1 * * * *', 'chat.cron.test', '>>/home/test.log')
     # ('*/1 * * * * sleep 10', 'chat.cron.test', '>>/home/test.log')
     # ('*/1 * * * *', 'zdl.chat.cron.test')
-    ('*/1 * * * * sleep 10', 'chat.cron.test'),  # not work
-    ('*/1 * * * *', 'chat.cron.test'),
-    ('*/1 * * * *', 'chat.views.timer'),    #not work
+    # ('*/1 * * * * sleep 10', 'chat.cron.test'),  # not work
+    # ('*/1 * * * *', 'chat.views.timer'),  # not work
+
+    # ('*/1 * * * *', 'chat.cron.test'),
+
+
+    ('0 21 * * *', 'chat.cron.unreadNote'),   #给又未读信息的人提醒
+    # ('1 21 * * *', 'chat.cron.unreadNote'),   #给又未读信息的人提醒
+    # ('2 21 * * *', 'chat.cron.unreadNote'),   #给又未读信息的人提醒
+
+    ('1 21 * * *', 'chat.cron.chatNote'),   #给没有未读的人发每天提醒
+    ('2 21 * * *', 'chat.cron.chatNote'),   #给没有未读的人发每天提醒
+    ('3 21 * * *', 'chat.cron.chatNote'),   #给没有未读的人发每天提醒
+
+    ('* */1 * * *', 'chat.cron.serviceNote'),   #每小时一次
+
 ]
 
 

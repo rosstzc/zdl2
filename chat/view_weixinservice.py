@@ -25,8 +25,8 @@ import  hashlib
 
 
 
-from views import GetSiteUrl, OnlineTime, GetUserUrl, saveMessage,GetTimeNow
-from  view_func import PostMessge
+# from  view_func import PostMessge,GetSiteUrl, saveMessage,GetTimeNow, score_today
+
 
 
 import sys
@@ -145,10 +145,13 @@ def responseMsg(request):
             # if info['unionid']:  #不能这样判断
             #     user.unionid = info['unionid']
             user.R_TIME = GetTimeNow()
+            user.time_login_today = GetTimeNow()
             user.W_NAME = W_NAME
             user.POSITION = info['city'] + ' ' + info['province']
             user.state = 1
             user.save()
+
+            user = score_today(user) #首次注册获得今日积分
 
 
             #创建plus表
@@ -162,7 +165,7 @@ def responseMsg(request):
 
             #以小秘书名义给用户发一条欢迎私信
             temp = 'Hello, 欢迎加入口语桥大家庭，有任何疑问或想法日后可跟我聊聊喔。查看使用帮助或给我们留言可点右链接： http://m.wsq.qq.com/165500268'
-            saveMessage(request, 1, uid, temp)
+            saveMessage(request, 1, uid, temp,'0')
 
             content = 'welcome to 24小时口语桥（首次访问点我）'
             # url = GetSiteUrl(request) + 'modify/' + str(uid) + '/?W_NAME=' + W_NAME
@@ -194,7 +197,7 @@ def responseMsg(request):
 
             #以小秘书名义给用户发一条欢迎私信
             temp = 'Hello, 欢迎加入口语桥大家庭，有任何疑问或想法日后可跟我聊聊喔。查看使用帮助或给我们留言可点右链接： http://m.wsq.qq.com/165500268'
-            saveMessage(request, 1, user.id, temp)
+            saveMessage(request, 1, user.id, temp,'0')
 
             # url = 'http://' + get_current_site(request).domain + '/register/' + W_NAME +'/'
             # replyContent = '欢迎进入24小时英语角，随时找人练口语、结伴学英语。点链接<a href="' +str(url) + '">花10秒完善资料后进入英语角！</a>   （注：链接是你进入英语角凭证，切勿转发给TA人）'
@@ -242,7 +245,7 @@ def responseMsg(request):
             # message.W_NAME = W_NAME
             # message.time = GetTimeNow()
             # message.save()
-            replyContent = '出了点错误，请你联系管理员处理，管理员微信号：zhichao'
+            replyContent = '出了点错误，请取消关注，然后再关注试试；若还不行，请联系管理员微信号：40429602'
             return getReplyXml(msg,replyContent)
         user = user[0]
 
@@ -330,12 +333,12 @@ def responseMsg(request):
                     PostMessge(token, str(PostText(user_chat.W_NAME, resMsg)))
                     #本地写信息
                     if msgContent != '':
-                        saveMessage(request, user.id, user_chat.id, msgContent)
+                        saveMessage(request, user.id, user_chat.id, msgContent, '1')
                         return ''
 
                 if msgType == 'image':
                     PostMessge(token, str(PostImg(user_chat.W_NAME, MEDIA_ID)))
-                    # saveMessage(request, user.id, user_chat.id, '[图片]')
+                    # saveMessage(request, user.id, user_chat.id, '[图片]','1')
                     return ''
 
                 if msgType == 'voice':
@@ -435,27 +438,55 @@ def CustomMenu(request,para):
     token = GetAccessToken()
     response = 0
     if para == 'create':
-        menu ='''
- {
-     "button":[
-      {
-          "type":"click",
-          "name":"快聊",
-          "key":"chat"
-       },
-      {
-          "type":"click",
-          "name":"消息",
-          "key":"message"
-       },
+        appid =''
+        redirect_uri = ''
+        url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + appid+ "&redirect_uri=" + redirect_uri + "&response_type=code&scope=snsapi_base&state=1#wechat_redirect"
+        menu = {
+             "button":[
         {
-          "type":"click",
-          "name":"我的",
-          "key":"my"
-       },
-        ]
- }
-            '''
+                    "type": "view",
+                    "name": "快聊",
+                    "url": url
+                },
+              {
+                  "type":"click",
+                  "name":"消息",
+                  "key":"message"
+               },
+                {
+                  "type":"click",
+                  "name":"我的",
+                  "key":"my"
+               },
+                ]
+         }
+
+
+ # bakcup
+ #        menu ='''
+ # {
+ #     "button":[
+ #      {
+ #          "type":"click",
+ #          "name":"快聊",
+ #          "key":"chat"
+ #       },
+ #      {
+ #          "type":"click",
+ #          "name":"消息",
+ #          "key":"message"
+ #       },
+ #        {
+ #          "type":"click",
+ #          "name":"我的",
+ #          "key":"my"
+ #       },
+ #        ]
+ # }
+ #            '''
+
+
+
         print 'customGet'
         url = createUrl + str(token)
         req = urllib2.Request(url, menu)

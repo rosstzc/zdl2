@@ -2,14 +2,17 @@
 
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage   #分页
 from django.contrib.sites.shortcuts import get_current_site
+from django.db.models import Q
+
 import  datetime
 import urllib,time,hashlib, json
 import urllib,urllib2,time,hashlib, json
 from models import *
 
-
-
 import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 
 
 def GetAccessToken():
@@ -35,6 +38,37 @@ def GetAccessToken():
     return token
 
 
+def score_today(my):
+    my.time_login_today = GetTimeNow()
+    my.score_today = '30'
+    if my.sex == '0':
+        my.score_today = '50'
+    my.save()
+    return my
+
+#保存信息
+def saveMessage(req, sid, rid, msg, read_not):
+    message = Message(sid_id=sid,
+                      rid_id=rid,
+                      content=msg,
+                      s_time=GetTimeNow(),
+                      read_not=read_not)
+    message.save()
+
+   #统计对方未读信息
+    unread = Message.objects.filter(sid_id=sid, rid_id=rid, read_not='0').count()
+
+    #在ChatList是保存两人之间的最新的对话，在数据库保留写入两条记录，a-b,b-a,但实际上只从第二个字段进行查找
+    # 所以先删除旧的，再插入新的
+    result = ChatList.objects.filter(Q(sid_id=sid, rid_id=rid) | Q(sid=rid, rid=sid))
+    if result.count() >= 1:
+        result.delete()
+
+    chat = ChatList(sid_id=sid, rid_id=rid, unread=unread, content=msg, time=GetTimeNow())
+    chat.save()
+    #反过来再插入一条
+    chat = ChatList(sid_id=rid, rid_id=sid, content=msg, time=GetTimeNow())
+    chat.save()
 
 
 def GetSiteUrl(req):

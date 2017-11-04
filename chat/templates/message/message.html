@@ -68,9 +68,10 @@
 {#            <div class="weui-panel__hd">聊过的</div>#}
         <div class="weui-panel__bd">
             {% for i in msgs %}
+                <a href="{{ siteUrl }}user/{{ i.sid.id }}">
             <div class="weui-media-box weui-media-box_appmsg">
                 <div class="weui-media-box__hd">
-                    <img class="weui-media-box__thumb" src="/media/{{ i.sid.image1 }}" alt="">
+                    <img class="weui-media-box__thumb" src="{{ i.sid.image_url }}" alt="">
                 </div>
                 <div class="weui-media-box__bd">
                     <h4 class="weui-media-box__title">{{ i.sid.name }}</h4>
@@ -78,6 +79,7 @@
                     <p class="weui-media-box__desc">{{ i.s_time }}</p>
                 </div>
             </div>
+                </a>
         {% endfor %}
         </div>
     </div>

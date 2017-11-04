@@ -55,6 +55,7 @@ class User(models.Model):
     coin = models.CharField(max_length=50, default='0',verbose_name='', blank=True)
     online = models.CharField(max_length=50, default='1',verbose_name='', blank=True)
     state = models.CharField(max_length=50, default='1',verbose_name='', blank=True)
+    time_gochat = models.CharField(max_length=100,blank=True)
     time_login_today = models.CharField(max_length=100,blank=True)
     city = models.CharField(max_length=50, verbose_name='', blank=True)
     industry = models.CharField(max_length=50, verbose_name='', blank=True)
@@ -87,7 +88,7 @@ class User(models.Model):
     province = models.CharField(max_length=50, blank=True)
     country = models.CharField(max_length=50, blank=True)
     remind_key = models.CharField(max_length=10, default='0',blank=True)  #用户48小时服务到期提醒
-    remind_time = models.CharField(max_length=100,blank=True)   #用于每天未读提醒、推送提醒
+    remind_time = models.CharField(max_length=100,blank=True)   #用于每天未读提醒、推送
     unread = models.CharField(max_length=10, default='0',blank=True)
     # headimgurl = models.CharField(max_length=500, blank=True)
     # unionid = models.CharField(max_length=200, blank=True)

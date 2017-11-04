@@ -41,6 +41,11 @@ from django.template.loader import get_template
 
 import  platform
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+
 # 首页
 def index(req):
     #GET  从api/chat_state 获取数据，然后返回到chat.html
@@ -106,7 +111,6 @@ def index(req):
 
         uid = req.COOKIES.get('UID')
         my = User.objects.get(id=uid)
-
         #查询time_login_today是否未今天，如果是就不给今天积分，如果不是就给积分，并且把时间改为今天时间
         time = my.time_login_today
         date_time = datetime.datetime.strptime(time,'%Y-%m-%d %H:%M:%S')
@@ -115,12 +119,8 @@ def index(req):
         DATETIME_FORMAT = '%Y-%m-%d'
         today_string = now.strftime(DATETIME_FORMAT)
         if  time_string != today_string :
-            # my.time_login_today = today_string
-            my.time_login_today = GetTimeNow()
-            my.score_today = '30'
-            if my.sex == '0':
-                my.score_today = '50'
-            my.save()
+            my = score_today(my)
+
 
 
         #发出邀请
@@ -132,10 +132,11 @@ def index(req):
                 return response
             else:
                 my.state = '2'
+                my.time_gochat = GetTimeNow()  #写入一个最近匹配时间，这样就不用一个自动脚本来刷新用户状态；
                 my.save()
-
-                #到user表找状态"匹配中"的人； todoo 写入一个最近匹配时间，这样就不用一个自动脚本来刷新用户状态；
-                user = User.objects.filter(state='2').exclude(id=uid)
+                start = OnlineTime(0.5)
+                #到user表找状态"匹配中"的人；
+                user = User.objects.filter(state='2',time_gochat__gt=start).exclude(id=uid)
 
                 #选择匹配异性进入如下模式, 如果自己有性别匹配异性，如果没有就随便匹配
                 if sex_match == '1' :
@@ -180,15 +181,17 @@ def index(req):
                         user_chat.score_sum = str(int(user_chat.score_sum) + 1)
                         user_chat.save()
 
-                        #給双方发微信推送告诉配对成功
-                        token = GetAccessToken()
-                        link = getUserLink(req, user_chat)
-                        resMsgA = '已匹配到 '+ user_chat.name + '，你们可以开始对话 :> \n(' + link + '的主页)'
-                        PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
+                        #线上环境
+                        if 'centos' in platform.platform():
+                            #給双方发微信推送告诉配对成功
+                            token = GetAccessToken()
+                            link = getUserLink(req, user_chat)
+                            resMsgA = '已匹配到 '+ user_chat.name + '，你们可以开始对话 :> \n(' + link + '的主页)'
+                            PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
 
-                        link = getUserLink(req, my)
-                        resMsgB = '已匹配到 '+ my.name + '，你们可以开始对话 :> \n(' + link + '的主页)'
-                        PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
+                            link = getUserLink(req, my)
+                            resMsgB = '已匹配到 '+ my.name + '，你们可以开始对话 :> \n(' + link + '的主页)'
+                            PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
 
                         response = HttpResponseRedirect(reverse('index'))
                         return response
@@ -207,14 +210,14 @@ def index(req):
                 user_chat.state = '1'
                 user_chat.save()
                 chat.update(close='1') #一般只有1个，考虑到容错，就全部更新
+                if 'centos' in platform.platform():
+                    token = GetAccessToken()
+                    #todoo 给双方发推送告诉已退出聊天
+                    resMsgA = '你已退出聊天'
+                    PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
 
-                token = GetAccessToken()
-                #todoo 给双方发推送告诉已退出聊天
-                resMsgA = '你已退出聊天'
-                PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
-
-                resMsgB = '对方已退出聊天'
-                PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
+                    resMsgB = '对方已退出聊天'
+                    PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
 
             if my.state == '2':
                 my.state = '1'
@@ -263,6 +266,7 @@ def index(req):
 
     #当前方案：本方法内调用获取登录后user数据，然后python渲染内容，包括写cookie
     #API方案: 前端js调用api获取数据，然后js渲染内容
+
 
 
 def getUserLink(req, user):
@@ -365,6 +369,8 @@ class Login(View):
         user = User.objects.filter(username=username, password=password)
         if user.count() > 0:
             user = user[0]
+            user.time_login_today = GetTimeNow()
+            user.save()
             response = HttpResponseRedirect(reverse('index'))
             # response.set_cookie('wname', user.get('wname'), max_age=10000000000)
             response.set_cookie('UID', user.id, max_age=10000000000)
@@ -390,7 +396,7 @@ class Login(View):
 
 def getUnreadSum(req):
     uid = req.COOKIES.get('UID')
-    unread = Message.objects.filter(rid_id=uid, read_not=0).count()
+    unread = Message.objects.filter(rid_id=uid, read_not='0').count()
     return unread
 
 
@@ -435,56 +441,34 @@ def showMessage(req,rid):
 
         msg = req.POST.get('msg')
         if msg != '':
-            saveMessage(req, uid, rid, msg)
+            saveMessage(req, uid, rid, msg, '0')
         url_full = HttpRequest.build_absolute_uri(req)
         return HttpResponseRedirect(url_full)
-
-
 
     else:
         #delete unread count
         message = Message.objects.filter(sid_id=rid, rid_id=uid, read_not='0')
-        message.update(read_not=1)
+        message.update(read_not='1')
         chatList = ChatList.objects.filter(sid_id=rid, rid_id=uid)
         chatList.update(unread=0)
 
         #对方名字
         userbName = User.objects.get(id=rid).name
-        userbUrl = GetUserUrl(req, rid)
+        siteUrl = GetSiteUrl(req)
         result = Message.objects.select_related().\
             filter(Q(sid_id=uid, rid_id=rid) | Q(sid_id=rid,rid_id=uid)).order_by('-s_time')[:100]
 
     context = {'msgs': result,
                'name':userbName,
-               'url':userbUrl
+               'siteUrl':siteUrl
+
                }
     response = render(req, 'message/message.html', context)
     return response
 
 
 
-#保存信息
-def saveMessage(req, sid, rid, msg):
-    message = Message(sid_id=sid,
-                      rid_id=rid,
-                      content=msg,
-                      s_time=GetTimeNow())
-    message.save()
 
-   #统计对方未读信息
-    unread = Message.objects.filter(sid_id=sid, rid_id=rid, read_not=0).count()
-
-    #在ChatList是保存两人之间的最新的对话，在数据库保留写入两条记录，a-b,b-a,但实际上只从第二个字段进行查找
-    # 所以先删除旧的，再插入新的
-    result = ChatList.objects.filter(Q(sid_id=sid, rid_id=rid) | Q(sid=rid, rid=sid))
-    if result.count() >= 1:
-        result.delete()
-
-    chat = ChatList(sid_id=sid, rid_id=rid, unread=unread, content=msg, time=GetTimeNow())
-    chat.save()
-    #反过来再插入一条
-    chat = ChatList(sid_id=rid, rid_id=sid, content=msg, time=GetTimeNow())
-    chat.save()
 
 
 def userProfile(req,uid):
@@ -623,20 +607,26 @@ def modifyInfo(req):
 def unreadReminder():
     token = GetAccessToken()
     chat = ChatList.objects.select_related().filter(time__gt=OnlineTime(48)).exclude(unread=0)
+    #去掉重复
     if chat.count() > 0:
         temp = [chat[0].rid]
+        #循环所有chat记录，每个用户只保留1条记录
         for i in chat:
+            k = 0
             user = i.rid
             for j in temp:
-                if j.id == user.id:
-                    break
-                else:
-                    temp.append(user)
+                if user.id == j.id:
+                    k = k + 1
+            if k == 0:
+                temp.append(user)
+                break
+
         for i in temp:
-            text = '你有未读留言，有请查看'
+            text = '你有未读留言，请点底部菜单[消息]查看'
             PostMessge(token, str(PostText(i.W_NAME, text)))
             i.remind_time = GetTimeNow()
             i.save()
+            print('给用户id：'+ str(i.id) +'发送未读提醒')
     return
 
 
@@ -648,7 +638,7 @@ def chatReminder():
     token = GetAccessToken()
     if users.count() > 0:
         for i in users:
-            text = '晚上好，在"九点聊天"等你，说出你的故事'
+            text = '晚上好，我们在#九点聊天#等你，听听你的故事'
             PostMessge(token, str(PostText(i.W_NAME, text)))
             i.remind_time = GetTimeNow()
             i.save()
@@ -662,12 +652,12 @@ def serviceRemind():
     start1 = OnlineTime(48)
     start2 = OnlineTime(36)
     hour = datetime.datetime.now().strftime("%H")
-    if int(hour) == 12 or  int(hour) == 17 or  int(hour) == 18 or  int(hour) == 19 or int(hour) == 20 or int(hour) == 21:
+    if int(hour) == 12  or  int(hour) == 19 or int(hour) == 20 or int(hour) == 21:
         result = User.objects.filter(time_login_today__gt=start1, time_login_today__lt=start2, remind_key="0")
         for i in result:
-            msgContent = '温馨提醒：由于微信48小时响应限制，你将在2小时后无法收到我们的通知。\n如果你想继续收到通知，请点【进入】菜单一次，以刷新状态。'
+            msgContent = '温馨提醒：由于微信48小时响应限制，你将在2小时后无法收到我们的通知。\n如果你想继续收到通知，请点【快聊】菜单一次，以刷新状态。'
             msgContent = PostFormat(msgContent)
-            PostMessge(token, str(PostText(i.uid.W_NAME, msgContent)))
+            PostMessge(token, str(PostText(i.W_NAME, msgContent)))
 
             i.remind_key = "1"
             i.save()
@@ -683,15 +673,14 @@ def onlineUser(req):
 
 #定时器
 def timer(req):
-    unreadReminder()
+    # unreadReminder()
     chatReminder()
-    serviceRemind()
-    user = User(username='333')
-    user.save()
+
     return HttpResponse('1')
 
-
-
+def test(req):
+    response = render(req, 'MP_verify_U4Tmj9FOXTelfMyx.txt')
+    return response
 
 def tick2():
     print('Tick! The time is: %s' % datetime.datetime.now())

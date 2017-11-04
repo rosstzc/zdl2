@@ -2,11 +2,13 @@ from django.conf.urls import  url
 from django.conf import settings
 from django.conf.urls.static import static
 
-from chat import views,view_weixinservice
+from chat import views
+from chat import view_weixinservice
 
 urlpatterns = [
 
     #chat
+    url(r'^MP_verify_U4Tmj9FOXTelfMyx.txt$', views.test, name=''),  #vervification for wechat
     url(r'^$', views.index, name='index'),
     url(r'^index/$', views.index, ),
     url(r'^login/$', views.Login.as_view(), ),
@@ -45,9 +47,6 @@ urlpatterns = [
     url(r'^api/chat_state/$', views.apiChatState, ),
 
     #message
-
-
-
 
 
     #my

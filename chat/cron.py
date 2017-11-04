@@ -12,10 +12,24 @@ def test():
     # user = User(username='444')
     # user.save()
 
-    unreadReminder()
-    chatReminder()
-    serviceRemind()
+    # unreadReminder()
+    # chatReminder()
     print ('123')
 
 
+def unreadNote():
+    unreadReminder()
+    return
 
+
+def chatNote():
+    chatReminder()
+    return
+
+
+def oneMin():
+
+    return
+
+def serviceNote():
+    serviceRemind()

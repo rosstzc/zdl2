@@ -37,7 +37,7 @@
         <a href=" {{ i.url }}" class="">
             <div class="weui-cell">
                 <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                    <img src="/media/{{ i.i.sid.image1 }}" style="width: 50px;height: 50px;display: block">
+                    <img src="{{ i.i.sid.image_url }}" style="width: 50px;height: 50px;display: block">
                     {% if i.i.unread != 0 %}
                     <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
                     {% endif %}
