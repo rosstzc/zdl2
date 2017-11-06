@@ -56,7 +56,7 @@
             </div>
             <div class="weui-cell__ft"></div>
         </a>
-        <a class="weui-cell weui-cell_access" href="javascript:;">
+        <a class="weui-cell weui-cell_access" href="{{ url_site }}score-desc/">
             <div class="weui-cell__bd">
                 <p>积分说明 </p>
             </div>
@@ -68,17 +68,17 @@
     <div></div>
 
 <div class="weui-cells">
-            <a class="weui-cell weui-cell_access" href="javascript:;">
-                <div class="weui-cell__bd">
-                    <p>购买金币</p>
-                </div>
-                <div class="weui-cell__ft">ff</div>
-            </a>
-            <a class="weui-cell weui-cell_access" href="javascript:;">
+{#            <a class="weui-cell weui-cell_access" href="javascript:;">#}
+{#                <div class="weui-cell__bd">#}
+{#                    <p>购买金币</p>#}
+{#                </div>#}
+{#                <div class="weui-cell__ft">ff</div>#}
+{#            </a>#}
+            <a class="weui-cell weui-cell_access" href="{{ url_site }}score-desc/">
                 <div class="weui-cell__bd">
                     <p>购买积分</p>
                 </div>
-                <div class="weui-cell__ft">可用积分：{{ my.score_today }}</div>
+                <div class="weui-cell__ft">可用积分：{{ score_aviable }}</div>
             </a>
 
 </div>
@@ -102,7 +102,7 @@
                 {% if unreadSum != 0 %}
                 <span class="weui-badge" style="position: absolute;top: -2px;right: -13px;">{{ unreadSum }}</span>
                 {% endif %}            </span>
-            <p class="weui-tabbar__label">消息</p>
+            <p class="weui-tabbar__label">留言</p>
 
         </a>
         <a href="{{ url_site }}my/" class="weui-tabbar__item weui-bar__item_on">

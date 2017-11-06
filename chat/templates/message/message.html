@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
-    <title>与某人消息列表</title>
+    <title>给 {{ name }} 留言</title>
     <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
     <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
 {##}
@@ -19,7 +19,7 @@
 
 
     <div class="container" id="app">
-      <h3 class="text-center"> 与 {{ name }} 聊天</h3>
+      <h3 class="text-center"> 给 {{ name }} 留言</h3>
 
 {#        {% for i in msgs %}#}
 {#            <div>发送者名称：{{ i.sid.name }}</div>#}
@@ -59,31 +59,53 @@
 
         </div>
         <div class="weui-btn-area">
-            <input type="submit" value="发送" class="weui-btn weui-btn_primary">
+            <input type="submit" value="留言" class="weui-btn weui-btn_primary">
         </div>
     </div>
 </form>
 
-    <div class="weui-panel weui-panel_access">
-{#            <div class="weui-panel__hd">聊过的</div>#}
-        <div class="weui-panel__bd">
-            {% for i in msgs %}
-                <a href="{{ siteUrl }}user/{{ i.sid.id }}">
-            <div class="weui-media-box weui-media-box_appmsg">
-                <div class="weui-media-box__hd">
-                    <img class="weui-media-box__thumb" src="{{ i.sid.image_url }}" alt="">
+
+
+        <div class="weui-panel weui-panel_access">
+{#        <div class="weui-panel__hd">聊过的</div>#}
+
+        {% for i in msgs %}
+        <a href=" {{ siteUrl }}user/{{ i.sid.id }}" class="weui-media-box weui-media-box_appmsg">
+            <div class="weui-cell">
+                <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
+                    <img src="{{ i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
                 </div>
-                <div class="weui-media-box__bd">
-                    <h4 class="weui-media-box__title">{{ i.sid.name }}</h4>
-                    <p class="weui-media-box__desc">{{ i.content }}</p>
-                    <p class="weui-media-box__desc">{{ i.s_time }}</p>
+                <div class="weui-cell__bd">
+                    <p>{{ i.sid.name }}</p>
+                    <p style="font-size: 13px;color: #888888;">{{ i.content }}</p>
+                    <p style="font-size: 13px;color: #888888;">{{ i.s_time }}</p>
                 </div>
+{#                <div class="weui-cell__ft">></div>#}
             </div>
-                </a>
+        </a>
         {% endfor %}
-        </div>
     </div>
 
+<!-- 备份，下面行高不会根据内容变化而变化 -->
+{#    <div class="weui-panel weui-panel_access">#}
+{#            <div class="weui-panel__hd">聊过的</div>#}
+{#        <div class="weui-panel__bd">#}
+{#            {% for i in msgs %}#}
+{#                <a href="{{ siteUrl }}user/{{ i.sid.id }}">#}
+{#            <div class="weui-media-box weui-media-box_appmsg">#}
+{#                <div class="weui-media-box__hd">#}
+{#                    <img class="weui-media-box__thumb" src="{{ i.sid.image_url }}" alt="">#}
+{#                </div>#}
+{#                <div class="weui-media-box__bd">#}
+{#                    <h4 class="weui-media-box__title">{{ i.sid.name }}</h4>#}
+{#                    <p class="weui-media-box__desc">{{ i.content }}</p>#}
+{#                    <p class="weui-media-box__desc">{{ i.s_time }}</p>#}
+{#                </div>#}
+{#            </div>#}
+{#                </a>#}
+{#        {% endfor %}#}
+{#        </div>#}
+{#    </div>#}
 
 
 

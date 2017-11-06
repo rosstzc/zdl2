@@ -3,72 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
-    <title>邀请</title>
+    <title>每晚九点，我在这里</title>
     <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
     <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js
+"></script>
+        <script src="https://cdn.bootcss.com/jquery.form/4.2.2/jquery.form.js"></script>
+
 
 {#    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>#}
 {#        <script src="https://unpkg.com/vue"></script>#}
+
     <style type="text/css">
         body {background-color: #f8f8f8}
     </style>
 
 </head>
 
-<body>
+<script>
 
 
+</script>
+
+
+<body >
+
+
+    <!--BEGIN toast-->
+    <div id="toast" style="display: none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+            <p class="weui-toast__content">已加 1 人气</p>
+        </div>
+    </div>
+    <!--end toast-->
 
 
 
     <div class="container" id="app">
-      <h3 class="text-center">邀请朋友来给自己打气</h3>
+        <div class="weui-cells__title">
+            {% if myself == 1 %}
+                请点右上[...]分享给朋友圈、微博的朋友
+            {% else %}
+            请点右上[...]分享给朋友圈、微博的朋友
+            {% endif %}
+        </div>
+{#      <h3 class="text-center">交朋识友需要人气，来帮他加点人气</h3>#}
 {#        [[ message ]]#}
     </div>
 
 
-<form class="" action="" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-    <div class="container" id="pp">
+    <div class="weui-cells">
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><img  src="/media/icon/icons8_2100.png" alt="" style="width:30px;height: 30px;margin-right:5px;display:block"></div>
+            <div class="weui-cell__bd">
+{#                <p style="font-size: 16px">大侠，请帮忙加点戏（哦不，是加点气）</p>#}
+                <p style="font-size: 16px"> 每晚九点，不聊不散，关注后马上开聊</p>
+            </div>
+{#            <div class="weui-cell__ft">说明文字</div>#}
+        </div>
 
-        <div class="weui-cells weui-cells_form">
-            <div class="weui-cell">
-                <div class="weui-cell__hd"><label class="weui-label" >用户名</label></div>
-                <div class="weui-cell__bd">
-                    <input class="weui-input" type="text" name="username"  placeholder="请输入用户名"/>
-                </div>
-            </div>
-            <div class="weui-cell">
-                <div class="weui-cell__hd"><label class="weui-label">密码</label></div>
-                <div class="weui-cell__bd">
-                    <input class="weui-input" type="text" name="password" placeholder="请输入密码"/>
-                </div>
-            </div>
+
+        <div class="weui-cell">
+
+        <div align="center" style="margin-top: 10px"><img src="/media/icon/qrcode.jpg" style="width: 80%;"></div>
+        </div>
+
+        <div align="center"> <p class="weui-msg__desc" style="font-size: 16px">长按二维码关注</p></div>
+        <br>
+{#        <br>#}
 
         </div>
-        <div class="weui-btn-area">
-            <input type="submit" value="登录" class="weui-btn weui-btn_primary">
 
-{#            <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips" type="sumit">确定</a>#}
+
+
+    <div class="weui-cells">
+        <div class="weui-cell">
+{#            <div class="weui-cell__hd">#}
+{#                <img  src="/media/icon/qrcode.jpg" alt="" style="width:130px;margin-right:5px;display:block">#}
+{#            </div>#}
+            <div class="weui-cell__bd">
+                <p>用心交流，开心聊天，认识新朋友，关注【九点聊天】相遇有意思的人</p>
+{#                <p class="weui-msg__desc" >每晚九点认识有意思的新朋友、聊聊天</p>#}
+            </div>
+{#            <div class="weui-cell__ft">每晚九点认识新朋友、聊天</div>#}
         </div>
+
+
     </div>
 
-</form>
 
 
 
-<!--
-<script type="text/javascript">
-    const vm = new Vue({
-    delimiters: ['[[', ']]'],
-  el: '#app',
-  data: {
-    message: "ttttttttt"
-  }
-});
-</script>
--->
-    <script src="../js/app.js"></script>
+<br>
+
+
 
 </body>
 </html>

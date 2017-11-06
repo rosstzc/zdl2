@@ -98,6 +98,8 @@ def index(req):
 
     #get方法
     else:
+
+
         #微信触发带登录特性的页面
         W_NAME = req.GET.get('W_NAME')
         if W_NAME:
@@ -107,7 +109,6 @@ def index(req):
             response.set_cookie('UID', my.id, max_age=10000000000)
             response.set_cookie('W_NAME', W_NAME, max_age=10000000000)
             return response
-
 
         uid = req.COOKIES.get('UID')
         my = User.objects.get(id=uid)
@@ -120,7 +121,7 @@ def index(req):
         today_string = now.strftime(DATETIME_FORMAT)
         if  time_string != today_string :
             my = score_today(my)
-
+            my.remind_key = '0'  #user表提醒状态，用户与48小时服务提醒
 
 
         #发出邀请
@@ -144,8 +145,9 @@ def index(req):
                         user = user.filter(sex='1')
                     if my.sex == '1':
                         user = user.filter(sex='0')
-                if user.count() > 0:
 
+
+                if user.count() > 0:
                     #12小时内匹配过的不重复匹配
                     start = OnlineTime(8)
                     chatRecord = Chat.objects.select_related().filter(Q(rid=uid) | Q(sid=uid), close='1',time__gt=start)
@@ -160,7 +162,7 @@ def index(req):
                             if i.id == j.sid_id or i.id == j.rid_id:
                                 k = k + 1
                         #如果最近没有聊过,就取这个
-                        if k == 0:
+                        if k == 0  or k == 1:
                             key = 1
                             user_chat = user[x]
                             break
@@ -186,24 +188,36 @@ def index(req):
                             #給双方发微信推送告诉配对成功
                             token = GetAccessToken()
                             link = getUserLink(req, user_chat)
-                            resMsgA = '已匹配到 '+ user_chat.name + '，你们可以开始对话 :> \n(' + link + '的主页)'
+                            resMsgA = '【系统消息】：刚刚为你匹配到 '+ user_chat.name + '，回复消息打个招呼，聊天请注意文明用语哦！ '
+                            # resMsgA = '已匹配到 '+ user_chat.name + '，你们可以开始对话 :> (' + link + '的主页)'
+                            PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
+                            resMsgA = '[' + user_chat.name + ']：您好 :>'
                             PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
 
+
                             link = getUserLink(req, my)
-                            resMsgB = '已匹配到 '+ my.name + '，你们可以开始对话 :> \n(' + link + '的主页)'
+                            resMsgB = '【系统消息】：已匹配到 '+ my.name + '，回复消息打个招呼吧 :>  '
+                            # resMsgB = '已匹配到 '+ my.name + '，回复消息打个招呼吧 :> \n(' + link + '的主页)'
+                            PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
+                            resMsgB = '[' + my.name + ']：您好 :>'
                             PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
 
                         response = HttpResponseRedirect(reverse('index'))
                         return response
 
-                # else:
-                #     return HttpResponse('all is busy') # 前端要效果
+
 
 
         #退出聊天
         if action == 'leave':
             if my.state == '3':
                 chat = Chat.objects.select_related().filter(Q(rid=uid) | Q(sid=uid), close='0')
+                #异常处理
+                if chat.count() == 0:
+                    my.state = '1'
+                    my.save()
+                    return HttpResponseRedirect(reverse('index'))
+
                 user_chat = GetUserChat(chat[0],uid)
                 my.state = '1'
                 my.save()
@@ -213,10 +227,10 @@ def index(req):
                 if 'centos' in platform.platform():
                     token = GetAccessToken()
                     #todoo 给双方发推送告诉已退出聊天
-                    resMsgA = '你已退出聊天'
+                    resMsgA = '【系统消息】：你已退出聊天'
                     PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
 
-                    resMsgB = '对方已退出聊天'
+                    resMsgB = '【系统消息】：对方已退出聊天'
                     PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
 
             if my.state == '2':
@@ -224,6 +238,19 @@ def index(req):
                 my.save()
             response = HttpResponseRedirect(reverse('index'))
             return response
+
+
+        #如果状态是2，并且time_gochat时间超过30分钟，让状态回复1
+        if my.state == '2':
+            start = OnlineTime(0.5)
+            if my.time_gochat != None and my.time_gochat != '':
+                time_gochat = my.time_gochat
+                if time_gochat < start:
+                    my.state = '1'
+                    my.save()
+        if my.introduction == '':
+            my.introduction = "这家伙很懒，什么都没写"
+        my.save()
 
 
         #如果状态是"聊天中"，
@@ -269,13 +296,14 @@ def index(req):
 
 
 
+
+
 def getUserLink(req, user):
     url = GetSiteUrl(req) + 'user/' + str(user.id)
     link = '<a href="' + url + '">' + user.name + '</a>'
     return link
 
 def invite(req):
-
     action = req.GET.get('action')
     uid = req.GET.get('uid')
     user = User.objects.get(id=uid)
@@ -286,11 +314,16 @@ def invite(req):
     if req.method == 'POST':
         user.score_forever = str(int(user.score_forever) + 1)
         user.save()
-    url_friend = GetSiteUrl(req)
+    url_friend = GetSiteUrl(req) + 'invite?action=desc&uid=' + uid
     content = {'user': user, 'myself':myself, 'url_friend':url_friend}
     #打气 (所有判断在前端完成)
     if action == 'daqi':
         response = render(req, 'user/daqi.html', content)
+        return response
+
+    if action == 'desc':
+
+        response = render(req, 'user/invite.html', content)
         return response
 
     response = render(req, 'user/invite.html', content)
@@ -298,7 +331,8 @@ def invite(req):
 
 
 def score_desc(req):
-    content = {}
+    site_url = GetSiteUrl(req)
+    content = {'site_url':site_url}
     response = render(req, 'chat/score_desc.html', content)
     return response
 
@@ -506,11 +540,12 @@ def my(req):
 
     uid = req.COOKIES.get('UID')
     my = User.objects.get(id=uid)
+    score_aviable = int(my.score_today) + int(my.score_forever)
     url_site = GetSiteUrl(req)
     url_info = GetSiteUrl(req) + 'user/' + uid
     url_daqi =  GetSiteUrl(req) + 'invite?action=daqi&uid=' + str(uid)
     unreadSum = getUnreadSum(req)
-    context = {'my': my, 'url_info':url_info, 'url_daqi':url_daqi, 'url_site':url_site, 'unreadSum':unreadSum}
+    context = {'my': my, 'url_info':url_info, 'url_daqi':url_daqi, 'url_site':url_site, 'unreadSum':unreadSum, 'score_aviable':score_aviable}
     response = render(req, 'user/my.html', context)
     return response
 
@@ -622,7 +657,7 @@ def unreadReminder():
                 break
 
         for i in temp:
-            text = '你有未读留言，请点底部菜单[消息]查看'
+            text = '你有未读留言，请点底部菜单[留言]查看'
             PostMessge(token, str(PostText(i.W_NAME, text)))
             i.remind_time = GetTimeNow()
             i.save()
@@ -652,13 +687,12 @@ def serviceRemind():
     start1 = OnlineTime(48)
     start2 = OnlineTime(36)
     hour = datetime.datetime.now().strftime("%H")
-    if int(hour) == 12  or  int(hour) == 19 or int(hour) == 20 or int(hour) == 21:
+    if int(hour) == 18  or  int(hour) == 19 or int(hour) == 20 or int(hour) == 21 or int(hour) == 22:
         result = User.objects.filter(time_login_today__gt=start1, time_login_today__lt=start2, remind_key="0")
         for i in result:
-            msgContent = '温馨提醒：由于微信48小时响应限制，你将在2小时后无法收到我们的通知。\n如果你想继续收到通知，请点【快聊】菜单一次，以刷新状态。'
+            msgContent = '【系统提醒】：由于微信48小时响应限制，你将在2小时后无法收到我们的通知。\n请点【快聊】菜单一次，以刷新状态。'
             msgContent = PostFormat(msgContent)
             PostMessge(token, str(PostText(i.W_NAME, msgContent)))
-
             i.remind_key = "1"
             i.save()
     return HttpResponse('1')
@@ -681,6 +715,9 @@ def timer(req):
 def test(req):
     response = render(req, 'MP_verify_U4Tmj9FOXTelfMyx.txt')
     return response
+
+
+
 
 def tick2():
     print('Tick! The time is: %s' % datetime.datetime.now())

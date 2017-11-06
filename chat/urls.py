@@ -46,6 +46,9 @@ urlpatterns = [
     # url(r'^api/register/$', views.API_Register.as_view(), name= "api_register" ),
     url(r'^api/chat_state/$', views.apiChatState, ),
 
+
+    url(r'^test/$', views.test, ),
+
     #message
 
 
@@ -62,6 +65,7 @@ urlpatterns = [
 
     #weixin
     url(r'^weixinservice/$',view_weixinservice.handleRequest, name=""),
+    url(r'^oauth2/$',view_weixinservice.oauth2, name=""),
 
 
 

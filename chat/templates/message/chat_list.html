@@ -30,30 +30,186 @@
 {#        {% endfor %}#}
     </div>
 
-    <div class="weui-panel weui-panel_access">
-        <div class="weui-panel__hd">聊过的</div>
 
-        {% for i in chatList %}
-        <a href=" {{ i.url }}" class="">
-            <div class="weui-cell">
-                <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">
-                    <img src="{{ i.i.sid.image_url }}" style="width: 50px;height: 50px;display: block">
+    <div class="weui-panel weui-panel_access">
+            <div class="weui-panel__hd">聊过的</div>
+        <div class="weui-panel__bd">
+            {% for i in chatList %}
+                <a href="{{ i.url }}" class="weui-media-box weui-media-box_appmsg">
+                <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
+                    <img  src="{{ i.i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
                     {% if i.i.unread != 0 %}
                     <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
                     {% endif %}
                 </div>
-                <div class="weui-cell__bd">
-                    <p>{{ i.i.sid.name }}</p>
-                    <p style="font-size: 13px;color: #888888;">{{ i.i.content }}</p>
-                    <p style="font-size: 13px;color: #888888;">{{ i.i.time }}</p>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
+                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
+                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
                 </div>
-                <div class="weui-cell__ft">></div>
-            </div>
-        </a>
+                                <div class="weui-cell__ft">></div>
 
-        {% endfor %}
+                </a>
+
+
+                                <a href="{{ i.url }}" class="weui-media-box weui-media-box_appmsg">
+                <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
+                    <img  src="{{ i.i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
+                    {% if i.i.unread != 0 %}
+                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
+                    {% endif %}
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
+                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
+                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
+                </div>
+                                <div class="weui-cell__ft">></div>
+
+                </a>
+
+
+                                <a href="{{ i.url }}" class="weui-media-box weui-media-box_appmsg">
+                <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
+                    <img  src="{{ i.i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
+                    {% if i.i.unread != 0 %}
+                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
+                    {% endif %}
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
+                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
+                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
+                </div>
+                                <div class="weui-cell__ft">></div>
+
+                </a>
+
+                                <a href="{{ i.url }}" class="weui-media-box weui-media-box_appmsg">
+                <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
+                    <img  src="{{ i.i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
+                    {% if i.i.unread != 0 %}
+                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
+                    {% endif %}
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
+                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
+                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
+                </div>
+                                <div class="weui-cell__ft">></div>
+
+                </a>
+
+
+
+                                <a href="{{ i.url }}" class="weui-media-box weui-media-box_appmsg">
+                <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
+                    <img  src="{{ i.i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
+                    {% if i.i.unread != 0 %}
+                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
+                    {% endif %}
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
+                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
+                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
+                </div>
+                                <div class="weui-cell__ft">></div>
+
+                </a>
+
+
+                                <a href="{{ i.url }}" class="weui-media-box weui-media-box_appmsg">
+                <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
+                    <img  src="{{ i.i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
+                    {% if i.i.unread != 0 %}
+                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
+                    {% endif %}
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
+                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
+                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
+                </div>
+                                <div class="weui-cell__ft">></div>
+
+                </a>
+
+                                <a href="{{ i.url }}" class="weui-media-box weui-media-box_appmsg">
+                <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
+                    <img  src="{{ i.i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
+                    {% if i.i.unread != 0 %}
+                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
+                    {% endif %}
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
+                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
+                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
+                </div>
+                                <div class="weui-cell__ft">></div>
+
+                </a>
+
+
+                                <a href="{{ i.url }}" class="weui-media-box weui-media-box_appmsg">
+                <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
+                    <img  src="{{ i.i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
+                    {% if i.i.unread != 0 %}
+                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
+                    {% endif %}
+                </div>
+                <div class="weui-media-box__bd">
+                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
+                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
+                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
+                </div>
+                                <div class="weui-cell__ft">></div>
+
+                </a>
+
+            {% endfor %}
+        </div>
 
     </div>
+
+
+{#    <div class="weui-cell">#}
+{#                <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">#}
+{#                    <img src="images/pic_160.png" style="width: 50px;display: block">#}
+{#                    <span class="weui-badge" style="position: absolute;top: -.4em;right: -.4em;">8</span>#}
+{#                </div>#}
+{#                <div class="weui-cell__bd">#}
+{#                    <p>联系人名称</p>#}
+{#                    <p style="font-size: 13px;color: #888888;">摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息摘要信息</p>#}
+{#                </div>#}
+{#            </div>#}
+
+
+    <!-- 备份，行高根据内容而改变高度-->
+{#    <div class="weui-panel weui-panel_access">#}
+{#        <div class="weui-panel__hd">聊过的</div>#}
+{##}
+{#        {% for i in chatList %}#}
+{#        <a href=" {{ i.url }}" class="">#}
+{#            <div class="weui-cell">#}
+{#                <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">#}
+{#                    <img src="{{ i.i.sid.image_url }}" style="width: 50px;height: 50px;display: block">#}
+{#                    {% if i.i.unread != 0 %}#}
+{#                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>#}
+{#                    {% endif %}#}
+{#                </div>#}
+{#                <div class="weui-cell__bd">#}
+{#                    <p>{{ i.i.sid.name }}</p>#}
+{#                    <p style="font-size: 13px;color: #888888;">{{ i.i.content }}</p>#}
+{#                    <p style="font-size: 13px;color: #888888;">{{ i.i.time }}</p>#}
+{#                </div>#}
+{#                <div class="weui-cell__ft">></div>#}
+{#            </div>#}
+{#        </a>#}
+{#        {% endfor %}#}
+{#    </div>#}
 
 
 
@@ -71,7 +227,7 @@
                 <span class="weui-badge" style="position: absolute;top: -2px;right: -13px;">{{ unreadSum }}</span>
                 {% endif %}
             </span>
-            <p class="weui-tabbar__label">消息</p>
+            <p class="weui-tabbar__label">留言</p>
 
         </a>
         <a href="{{ url_site }}my/" class="weui-tabbar__item">

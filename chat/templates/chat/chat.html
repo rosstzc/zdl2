@@ -80,6 +80,19 @@
                 return false
             });
 
+            gochat = $("#gochat");
+            gochat.click(function () {
+                WeixinJSBridge.call('closeWindow');
+{#                window.close();#}
+{#            $.get("{{ url_gochat }}",function(data,status){#}
+{##}
+{#            alert("数据：" + data + "\n状态：" + status);#}
+{#                if (data === '1') {#}
+{##}
+{#                }#}
+{#             });#}
+            });
+
         })
     </script>
 
@@ -110,8 +123,12 @@
 
     {% if state == '1' %}   {# 空闲中 #}
         <div class="button-sp-area">
-        <div align="center"><div >这里要放一个图片</div></div>
-        <div ><a href="{{ url_gochat }}"  class="weui-btn weui-btn_plain-primary" style="width: 200px">随机匹配</a>  </div>
+        <div align="center">
+            <img src="{{  url_site }}media/icon/icons8_2100.png" alt=""  class="" style="padding-top: 50px;padding-bottom: 40px" >
+        </div>
+
+        <div ><a href="{{ url_gochat }}"  class="weui-btn weui-btn_plain-primary" style="width: 200px" >快速匹配</a>  </div>
+
         </div>
 
     {% elif state == '2' %}  {# 匹配中 #}
@@ -128,7 +145,7 @@
     {% else %}   {# 成功匹配 #}
 
         <div style="margin-top: 20px" class="weui-panel weui-panel_access">
-{#            <div class="weui-panel__hd">图文组合列表</div>#}
+{#            <div class="weui-panel__hd">已匹配</div>#}
             <div class="weui-panel__bd">
                 <a href="{{ url_info }}" class="weui-media-box weui-media-box_appmsg">
                     <div class="weui-media-box__hd">
@@ -145,20 +162,27 @@
         </div>
 
         <div class="weui-msg">
-            <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+{#            <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>#}
             <div class="weui-msg__text-area">
-                <h2 class="weui-msg__title">成功匹配 <a href="{{ url_info }}">{{ user_chat.name }}</a>，点左上角『返回/关闭』到公众号对话框与TA对话.</h2>
-{#                <p class="weui-msg__desc">网友都比较忙，系统自动匹配30分钟</p>#}
+                <h4 class="weui-msg__title">成功匹配：{{ user_chat.name }}</h4>
+{#                <h2 class="weui-msg__title">成功匹配 <a href="{{ url_info }}">{{ user_chat.name }}</a>，点左上角『返回/关闭』到公众号对话框与TA对话.</h2>#}
             </div>
         </div>
+        <div align="center">
 
-        <div align="center">  | <a href="" id="leave">离开</a> </div>
+            <a href="javascript:;" class="weui-btn weui-btn_plain-primary" style="width: 150px" id="gochat">去聊天</a>
+            <a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_default" style="width: 150px; margin-top: 20px" id="leave">离开</a>
+        </div>
+
+
+{#        <div align="center">  | <a href="" id="gochat">去聊天</a> </div>#}
+{#        <div align="center">  | <a href="" >离开</a> </div>#}
     {% endif %}
 
 
-        <div align="center">
-            <a href="http://baidu.com">
-          <div  class="weui-cells__title">可用积分：{{ score_available }}</div>
+        <div align="left" style="padding-left: 7px; padding-top: 10px;">
+            <a href="{{ url_site }}score-desc">
+          <div  class="weui-cells__title" >可用积分:{{ score_available }}，赚积分</div>
                 </a>
         </div>
 
@@ -182,6 +206,8 @@
 {#    <div>325</div>#}
 {#</div>#}
 
+
+
     <div class="weui-tabbar">
         <a href="{{ url_site }}" class="weui-tabbar__item weui-bar__item_on">
             <img src="{{ url_site }}media/icon/icons8-Lightning Bolt_2.png" alt="" class="weui-tabbar__icon">
@@ -196,7 +222,7 @@
                 <span class="weui-badge" style="position: absolute;top: -2px;right: -13px;">{{ unreadSum }}</span>
                 {% endif %}
             </span>
-            <p class="weui-tabbar__label">消息</p>
+            <p class="weui-tabbar__label">留言</p>
 
         </a>
         <a href="{{ url_site }}my/" class="weui-tabbar__item">
@@ -226,7 +252,7 @@
         <div class="js_dialog" id="iosDialogLeave" style="display: none;">
             <div class="weui-mask"></div>
             <div class="weui-dialog">
-                <div class="weui-dialog__bd">确定离开当前聊天？</div>
+                <div class="weui-dialog__bd">你正在与"{{ user_chat.name }}"聊天，确定退出？</div>
                 <div class="weui-dialog__ft">
                     <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_default" id="delete_cancel">取消</a>
                     <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary" id="delete_confirm">确定</a>

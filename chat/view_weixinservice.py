@@ -34,6 +34,7 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 
+
 TOKEN = "zdl"
 
 
@@ -92,7 +93,7 @@ def responseMsg(request):
     msgPicUrl = msg.get('PicUrl')
     msgContent = msg.get('Content')
     W_NAME =  msg.get('FromUserName')#微信openid，对应着user表的w_name
-
+    print(W_NAME)
     #新增 普通信息类型相关参数，语音、视频、地理位置...
     #图片
     msgMediaId = msg.get('MediaId')
@@ -146,6 +147,8 @@ def responseMsg(request):
             #     user.unionid = info['unionid']
             user.R_TIME = GetTimeNow()
             user.time_login_today = GetTimeNow()
+            user.remind_time = GetTimeNow()
+            user.time_gochat = GetTimeNow()
             user.W_NAME = W_NAME
             user.POSITION = info['city'] + ' ' + info['province']
             user.state = 1
@@ -164,15 +167,15 @@ def responseMsg(request):
             # plus.save()
 
             #以小秘书名义给用户发一条欢迎私信
-            temp = 'Hello, 欢迎加入口语桥大家庭，有任何疑问或想法日后可跟我聊聊喔。查看使用帮助或给我们留言可点右链接： http://m.wsq.qq.com/165500268'
+            temp = '欢迎到[九点聊天]，完善的个人档案让你更受青睐，请点"我的/头像"进入更新资料。'
             saveMessage(request, 1, uid, temp,'0')
 
-            content = 'welcome to 24小时口语桥（首次访问点我）'
+            content = '欢迎到[九点聊天]，完善的个人档案让你更受青睐，用心聊天，开心聊天！'
             # url = GetSiteUrl(request) + 'modify/' + str(uid) + '/?W_NAME=' + W_NAME
             # replyContent =content + '\n据统计，资料完善的用户更受青睐，请点<a href="' +str(url) + '">完善你的资料</a> 。\n（注：链接是包含隐私信息，切勿转发给TA人）'
             # return getReplyXml(msg,replyContent)
 
-            url = GetSiteUrl(request) + 'modify-info/' + '?W_NAME=' + user.W_NAME
+            url = GetSiteUrl(request) + 'my/' + '?W_NAME=' + user.W_NAME
             temp =  GetImageTextXML2(msg,
 
                                      content,
@@ -180,9 +183,9 @@ def responseMsg(request):
                                      '',
                                      str(url),#不是为啥，这里不识别，必须先转换string
 
-                                     '据统计，资料完善的用户更受青睐，现在去完善资料>>',
+                                     '每天晚上九点，不聊不散',
                                      '',
-                                     'http://ww1.sinaimg.cn/small/489cbcd0gw1elajan2es5j2074074aa3.jpg',
+                                     '',
                                      str(url),#不是为啥，这里不识别，必须先转换string
             )
             return temp
@@ -191,12 +194,12 @@ def responseMsg(request):
         else:
             user = User.objects.get(W_NAME=W_NAME)
             # user.save()
-            replyContent = '欢迎回到24小时英语角！点菜单:【快聊】或【找角友】找小伙伴聊英语吧'
+            replyContent = '感谢你再次关注我们，祝聊天愉快！'
             # unread = UnreadTips(request,uid)  #未读信息
             # replyContent = replyContent + unread
 
             #以小秘书名义给用户发一条欢迎私信
-            temp = 'Hello, 欢迎加入口语桥大家庭，有任何疑问或想法日后可跟我聊聊喔。查看使用帮助或给我们留言可点右链接： http://m.wsq.qq.com/165500268'
+            temp = '感谢你再次关注我们，如有问题建议可加客服微信：yingyumishu'
             saveMessage(request, 1, user.id, temp,'0')
 
             # url = 'http://' + get_current_site(request).domain + '/register/' + W_NAME +'/'
@@ -204,12 +207,12 @@ def responseMsg(request):
             #     return getReplyXml(msg,replyContent)
             url = GetSiteUrl(request) + '?W_NAME=' + user.W_NAME
             temp =  GetImageTextXML2(msg,
-                                     '点我刷新登录',
+                                     replyContent,
                                      '',
                                      '',
                                      str(url),#不是为啥，这里不识别，必须先转换string
 
-                                     replyContent,
+                                     '每一次相遇都是不一样的体验',
                                      '',
                                      '',
                                      str(url),#不是为啥，这里不识别，必须先转换string
@@ -267,12 +270,12 @@ def responseMsg(request):
             return temp
 
 
-        #点自定义菜单 消息
+        #点自定义菜单 留言
         if eventMsg == 'CLICK' and eventKey == 'message':
             url =  GetSiteUrl(request)+ 'chat-list/' + '?W_NAME=' + user.W_NAME
-            replyContent = '查看消息'
+            replyContent = '查看留言'
             temp = GetImageTextXML2(msg,
-                                    '查看消息',
+                                    '查看留言',
                                     '',
                                     '',
                                     str(url),  # 不是为啥，这里不识别，必须先转换string
@@ -303,14 +306,28 @@ def responseMsg(request):
 
         #我向微信发信息
         if eventMsg != 'CLICK':
-            print 'sentweixin'
 
+            #下面没有用的，因为自定义菜单默认post一个信息到weixinservice
+            if eventMsg == 'VIEW':
+                print('view menu')
+                return
+                # def remindLogin(req, uid):
+                #     if uid == None or uid == '':
+                #         resMsg = '你未登录，请点击下面菜单【我的 > 登录】'
+                #         resMsg = PostFormat(resMsg)
+                #         token = GetAccessToken()
+                #         # 触发一个post文本给B
+                #         PostMessge(token, str(PostText(user_chat.W_NAME, resMsg)))
+                #         return temp
+
+
+            print 'sentweixin'
             if user.state == '1':
-                resMsg = '你在空闲状态，可点自定义菜单『快聊』匹配聊天。若有问题或建议，请加客服微信：XXXXX 交流'
+                resMsg = '【系统消息】你在空闲状态，可点自定义菜单『快聊』匹配聊天。有问题或建议，请加客服微信号:yingyumishu （英语秘书的拼音）'
                 return getReplyXml(msg,resMsg)
 
             if user.state == '2':
-                resMsg = '你在配对中，系统正在随时为你匹配到聊天朋友，请你留意消息通知通知。若有问题或建议，请加客服微信：XXXXX 交流'
+                resMsg = '【系统消息】你在自动配对中，系统正在为你匹配到聊天朋友，请留意消息通知。有问题或建议，请加客服微信号:yingyumishu （英语秘书的拼音）'
                 return getReplyXml(msg,resMsg)
 
             #在对话状态，我给微信发信息就是给对方发信息
@@ -422,75 +439,116 @@ def GetNewMediaID(mediaID):
 
 
 
+def oauth2(request):
+    print('oauth2')
+    code = request.GET.get('code')
+    state = request.GET.get('state')
+    print('state:' + state)
+
+    appid = 'wxc5853ef7e04ad6d7'
+    secret = 'b4e16bf8f6f1fa35db574df49d7ac137'
+    web_access_token_url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + appid + "&secret="+ secret +"&code="+ code+ "&grant_type=authorization_code"
+
+    response = urllib2.urlopen(web_access_token_url)
+    html = response.read()
+    tokeninfo = json.loads(html)
+    W_NAME = tokeninfo['openid'] #openid
+
+    url0 = GetSiteUrl(request) + '?W_NAME=' + W_NAME
+    url1 = GetSiteUrl(request) + 'chat-list/' + '?W_NAME=' + W_NAME
+    url2 = GetSiteUrl(request) + 'my' + '?W_NAME=' + W_NAME
+
+    if state == '0':
+        response = HttpResponseRedirect(url0)
+        return response
+    if state == '1':
+        response = HttpResponseRedirect(url1)
+        return response
+    if state == '2':
+        response = HttpResponseRedirect(url2)
+        return response
+    return
+
+
 def CustomMenu(request,para):
 
     delMenuUrl = "https://api.weixin.qq.com/cgi-bin/menu/delete?access_token="
     createUrl = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token="
     getMenuUrl="https://api.weixin.qq.com/cgi-bin/menu/get?access_token="
 
-    index_url = GetSiteUrl(request) + 'index/' + '?para=custom'
-    chatted_url = GetSiteUrl(request) + 'chatted/' + '?para=custom'
-    guide_url = GetSiteUrl(request) + 'guide/' + '?para=custom'
+    # chat_url = GetSiteUrl(request)
+    # chatlist_url = GetSiteUrl(request) +'chat-list/'
+    # url2 = GetSiteUrl(request) + 'my' + '?W_NAME=' + W_NAME
 
-    # inbox_url = GetSiteUrl(request) + 'inbox/' + '?para=custom'
-    # modify_url = GetSiteUrl(request) + 'modify/' + '?para=custom'
 
     token = GetAccessToken()
     response = 0
     if para == 'create':
-        appid =''
-        redirect_uri = ''
-        url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + appid+ "&redirect_uri=" + redirect_uri + "&response_type=code&scope=snsapi_base&state=1#wechat_redirect"
-        menu = {
-             "button":[
+        appid = Config.objects.get(key='appid', version=0).value
+        redirect_uri = GetSiteUrl(request) + 'oauth2'
+        redirect_uri = urllib.quote(redirect_uri,safe='')
+        #0,1,2 state用户标记跳转到那个页面, 0首页， 1消息列表， 2我的
+        oauth2_url_0 = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + appid+ "&redirect_uri=" + redirect_uri + "&response_type=code&scope=snsapi_base&state=0#wechat_redirect"
+        oauth2_url_1 = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + appid+ "&redirect_uri=" + redirect_uri + "&response_type=code&scope=snsapi_base&state=1#wechat_redirect"
+        oauth2_url_2 = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + appid+ "&redirect_uri=" + redirect_uri + "&response_type=code&scope=snsapi_base&state=2#wechat_redirect"
+        # # url_site = "http://baidu.com"
+
+        print(oauth2_url_0)
+        data =  {
+         "button":[
+             {
+                  "type":"view",
+                  "name":"快聊",
+                  "url": oauth2_url_0
+              },
+             {
+                  "type":"view",
+                  "name":"留言",
+                  "url": oauth2_url_1
+              },
+             {
+                 "type": "view",
+                 "name": "我的",
+                 "url": oauth2_url_2
+             },
+            ]
+        }
+        data = json.dumps(data, ensure_ascii=False)  #原data内中文被dict为unicode，所有要decode一下
+        data = str(data)
+        url = createUrl + str(token)
+        req = urllib2.Request(url, data)
+        response = urllib2.urlopen(req)
+
+
+# #bakup
+    if para == 'createOld':
+        menu ='''
         {
-                    "type": "view",
-                    "name": "快聊",
-                    "url": url
-                },
-              {
-                  "type":"click",
-                  "name":"消息",
-                  "key":"message"
-               },
-                {
-                  "type":"click",
-                  "name":"我的",
-                  "key":"my"
-               },
-                ] 
-         }
+            "button":[
+             {
+                 "type":"click",
+                 "name":"快聊",
+                 "key":"chat"
+              },
+             {
+                 "type":"click",
+                 "name":"留言",
+                 "key":"message"
+              },
+               {
+                 "type":"click",
+                 "name":"我的",
+                 "key":"my"
+              },
+               ]
+        }
+                   '''
 
 
- # bakcup
- #        menu ='''
- # {
- #     "button":[
- #      {
- #          "type":"click",
- #          "name":"快聊",
- #          "key":"chat"
- #       },
- #      {
- #          "type":"click",
- #          "name":"消息",
- #          "key":"message"
- #       },
- #        {
- #          "type":"click",
- #          "name":"我的",
- #          "key":"my"
- #       },
- #        ]
- # }
- #            '''
-
-
-
-        print 'customGet'
         url = createUrl + str(token)
         req = urllib2.Request(url, menu)
         response = urllib2.urlopen(req)
+
 
     elif para == 'del':
         url = delMenuUrl + str(token)
