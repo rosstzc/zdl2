@@ -24,8 +24,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 if 'centos' in platform.platform():
     #线上
-    # DEBUG = False
-    DEBUG = True
+    DEBUG = False
+    # DEBUG = True
 else:
     #开发
     DEBUG = True

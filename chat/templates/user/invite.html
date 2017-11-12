@@ -27,8 +27,11 @@
 </script>
 
 
-<body >
-
+{% if BrowserType == 5 %}
+    <body style="width: 450px;" >
+{% else %}
+    <body style="">
+{% endif %}
 
     <!--BEGIN toast-->
     <div id="toast" style="display: none;">

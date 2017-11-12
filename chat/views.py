@@ -187,18 +187,19 @@ def index(req):
                         if 'centos' in platform.platform():
                             #給双方发微信推送告诉配对成功
                             token = GetAccessToken()
-                            link = getUserLink(req, user_chat)
-                            resMsgA = '【系统消息】：刚刚为你匹配到 '+ user_chat.name + '，回复消息打个招呼，聊天请注意文明用语哦！ '
+                            resMsgA = '【系统消息】刚刚为你匹配到 '+ user_chat.name + '，回复消息打个招呼，聊天请注意文明用语哦！ '
                             # resMsgA = '已匹配到 '+ user_chat.name + '，你们可以开始对话 :> (' + link + '的主页)'
                             PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
+
                             resMsgA = '[' + user_chat.name + ']：您好 :>'
                             PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
 
 
                             link = getUserLink(req, my)
-                            resMsgB = '【系统消息】：已匹配到 '+ my.name + '，回复消息打个招呼吧 :>  '
+                            resMsgB = '【系统消息】已匹配到 '+ my.name + '，回复消息打个招呼吧 :>  '
                             # resMsgB = '已匹配到 '+ my.name + '，回复消息打个招呼吧 :> \n(' + link + '的主页)'
                             PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
+
                             resMsgB = '[' + my.name + ']：您好 :>'
                             PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
 
@@ -227,10 +228,10 @@ def index(req):
                 if 'centos' in platform.platform():
                     token = GetAccessToken()
                     #todoo 给双方发推送告诉已退出聊天
-                    resMsgA = '【系统消息】：你已退出聊天'
+                    resMsgA = '【系统消息】你已退出聊天'
                     PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
 
-                    resMsgB = '【系统消息】：对方已退出聊天'
+                    resMsgB = '【系统消息】对方已退出聊天'
                     PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
 
             if my.state == '2':
@@ -303,7 +304,26 @@ def getUserLink(req, user):
     link = '<a href="' + url + '">' + user.name + '</a>'
     return link
 
+
+def CheckBrowser(req):
+    meta = req.META['HTTP_USER_AGENT']
+    BrowserType = 5
+
+    if 'MicroMessenger' in meta:
+        BrowserType = 0
+
+    if 'MicroMessenger' in meta and 'Android' in meta:
+        BrowserType = 1
+    elif 'iPhone' in meta:
+        BrowserType = 2  #表明是iphone 浏览器或 iphone微信
+    elif 'Android' in meta:
+        BrowserType = 3  #表明是androidl浏览器
+
+    return BrowserType  #如果是5，表示不是手机浏览器
+
+
 def invite(req):
+    BrowserType = CheckBrowser(req)
     action = req.GET.get('action')
     uid = req.GET.get('uid')
     user = User.objects.get(id=uid)
@@ -315,7 +335,7 @@ def invite(req):
         user.score_forever = str(int(user.score_forever) + 1)
         user.save()
     url_friend = GetSiteUrl(req) + 'invite?action=desc&uid=' + uid
-    content = {'user': user, 'myself':myself, 'url_friend':url_friend}
+    content = {'user': user, 'myself':myself, 'url_friend':url_friend, 'BrowserType':BrowserType}
     #打气 (所有判断在前端完成)
     if action == 'daqi':
         response = render(req, 'user/daqi.html', content)
@@ -331,8 +351,9 @@ def invite(req):
 
 
 def score_desc(req):
+    uid = req.COOKIES.get('UID')
     site_url = GetSiteUrl(req)
-    content = {'site_url':site_url}
+    content = {'site_url':site_url, 'uid':uid}
     response = render(req, 'chat/score_desc.html', content)
     return response
 
@@ -657,7 +678,7 @@ def unreadReminder():
                 break
 
         for i in temp:
-            text = '你有未读留言，请点底部菜单[留言]查看'
+            text = '【系统消息】你有未读留言，请点底部菜单[留言]查看'
             PostMessge(token, str(PostText(i.W_NAME, text)))
             i.remind_time = GetTimeNow()
             i.save()
@@ -673,7 +694,7 @@ def chatReminder():
     token = GetAccessToken()
     if users.count() > 0:
         for i in users:
-            text = '晚上好，我们在#九点聊天#等你，听听你的故事'
+            text = '【系统消息】晚上好，我们在#九点聊天#等你，听听你的故事'
             PostMessge(token, str(PostText(i.W_NAME, text)))
             i.remind_time = GetTimeNow()
             i.save()
@@ -690,7 +711,7 @@ def serviceRemind():
     if int(hour) == 18  or  int(hour) == 19 or int(hour) == 20 or int(hour) == 21 or int(hour) == 22:
         result = User.objects.filter(time_login_today__gt=start1, time_login_today__lt=start2, remind_key="0")
         for i in result:
-            msgContent = '【系统提醒】：由于微信48小时响应限制，你将在2小时后无法收到我们的通知。\n请点【快聊】菜单一次，以刷新状态。'
+            msgContent = '【系统提醒】：由于微信48小时响应限制，你将在2小时后无法收到我们的通知。\n请点【配对】菜单一次，以刷新状态。'
             msgContent = PostFormat(msgContent)
             PostMessge(token, str(PostText(i.W_NAME, msgContent)))
             i.remind_key = "1"

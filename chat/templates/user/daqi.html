@@ -3,13 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
-    <title>朋友多人气多，来帮我加点人气吧</title>
+
+  <!--  Meta for Twitter Card -->
+{#  <meta content="summary" property="twitter:card">#}
+{#  <meta content="@jianshucom" property="twitter:site">#}
+{#  <meta content="双十一到了，哪些书值得屯？" property="twitter:title">#}
+{#  <meta content="双十一马上就到了。如果实在想不好该买什么，就屯点书吧。 和国外相比，国内的书算是相当便宜的了。过去十年里，房价飞了，衣服贵了，连豆浆油条都涨价了，唯独书的价格，由于电商的出现，没有太大的涨幅。对读书人来说，也不知算是幸运还是不幸。 大多数书，平时都可以直接买，当当、亚马逊和京东们，时不时会有满减的活动。双十一的特殊之处，一是满减的幅度较大，一般各家都会推满200减100，或是直接5折；二是参加满减的书目种类会更多，有些平时姿态矜持的经典也会选择屈尊来凑个热闹。 因此，双十一值得屯的书，就一个特点：贵。 那些平时看到价格会犹豫，不太舍得出手的书，都在双十一打包解决了吧。 1. DK系列 重..." property="twitter:description">#}
+{#  <meta content="http://www.jianshu.com/p/0c91d5a2c466" property="twitter:url">#}
+{#  <!-- End -->#}
+
+    <meta name="description" content="PMCAFF产品经理社区是国内最早的产品经理社区，分享最新的国内外互联网行业动态，交流产品设计、用户体验、交互设计、产品运营和团队管理等相关知识，PMCAFF产品经理社区是产品经理等产品爱好者最好的交流学习社区。">
+
+
+
+    <title>随手解救困难青年，来给【{{ user.name }}】打点气</title>
     <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
     <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
     <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js
 "></script>
         <script src="https://cdn.bootcss.com/jquery.form/4.2.2/jquery.form.js"></script>
+        <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+
 
 
 {#    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>#}
@@ -99,9 +114,11 @@
 
 </script>
 
-
-<body >
-
+{% if BrowserType == 5 %}
+    <body style="width: 450px">
+{% else %}
+    <body style="">
+{% endif %}
 
     <!--BEGIN toast-->
     <div id="toast" style="display: none;">
@@ -116,6 +133,7 @@
 
 
     <div class="container" id="app">
+
         <div class="weui-cells__title">
             {% if myself == 1 %}
                 请点右上[...]分享到朋友圈、微博等邀请朋友帮忙打气
@@ -127,6 +145,8 @@
 {#        [[ message ]]#}
     </div>
 
+{#    <img style="" src="http://www.lingbianji.com/media/fig/38c460c525e109ce9abd807ddefedff1e97d47703f179-EhO99q_fw658.jpeg">#}
+{#<img class="uploaded-img" src="//upload-images.jianshu.io/upload_images/2416866-cbb3fedb4c74ec4d.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240"><br><div class="image-caption">#}
 
     <div class="weui-cells">
         <div class="weui-cell">
@@ -163,7 +183,11 @@
 {#        <br>#}
 
         <div class="weui-btn-area">
-                    <a href="{{ url_friend }}" style="width: 200px" class="weui-btn weui-btn_plain-primary">我也去认识新朋友</a>
+            {% if myself == 1 %}
+                <a href="{{ url_friend }}" style="width: 200px" class="weui-btn weui-btn_plain-primary">分享给朋友</a>
+                {% else %}
+                <a href="{{ url_friend }}" style="width: 200px" class="weui-btn weui-btn_plain-primary">我也去认识新朋友</a>
+            {% endif %}
         </div>
 
         <br>
@@ -213,7 +237,6 @@
 
 
 <br>
-
 
 
 </body>

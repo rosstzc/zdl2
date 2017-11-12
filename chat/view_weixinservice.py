@@ -170,7 +170,7 @@ def responseMsg(request):
             temp = '欢迎到[九点聊天]，完善的个人档案让你更受青睐，请点"我的/头像"进入更新资料。'
             saveMessage(request, 1, uid, temp,'0')
 
-            content = '欢迎到[九点聊天]，完善的个人档案让你更受青睐，用心聊天，开心聊天！'
+            content = '欢迎到[九点聊天]，点我去完善的个人档案让你更受青睐，用心聊天，开心聊天！'
             # url = GetSiteUrl(request) + 'modify/' + str(uid) + '/?W_NAME=' + W_NAME
             # replyContent =content + '\n据统计，资料完善的用户更受青睐，请点<a href="' +str(url) + '">完善你的资料</a> 。\n（注：链接是包含隐私信息，切勿转发给TA人）'
             # return getReplyXml(msg,replyContent)
@@ -199,7 +199,7 @@ def responseMsg(request):
             # replyContent = replyContent + unread
 
             #以小秘书名义给用户发一条欢迎私信
-            temp = '感谢你再次关注我们，如有问题建议可加客服微信：yingyumishu'
+            temp = '感谢你再次关注我们，如有问题建议可加客服微信：yingyumishu ；另外，聊天请注意文明用语哦'
             saveMessage(request, 1, user.id, temp,'0')
 
             # url = 'http://' + get_current_site(request).domain + '/register/' + W_NAME +'/'
@@ -252,7 +252,7 @@ def responseMsg(request):
             return getReplyXml(msg,replyContent)
         user = user[0]
 
-        #点自定义菜单 快聊
+        #点自定义菜单 配对
         if eventMsg == 'CLICK' and eventKey == 'chat':
             url = GetSiteUrl(request) + '?W_NAME=' + user.W_NAME
             replyContent = '点我登录'
@@ -323,7 +323,7 @@ def responseMsg(request):
 
             print 'sentweixin'
             if user.state == '1':
-                resMsg = '【系统消息】你在空闲状态，可点自定义菜单『快聊』匹配聊天。有问题或建议，请加客服微信号:yingyumishu （英语秘书的拼音）'
+                resMsg = '【系统消息】你在空闲状态，可点自定义菜单『配对』匹配聊天。有问题或建议，请加客服微信号:yingyumishu （英语秘书的拼音）'
                 return getReplyXml(msg,resMsg)
 
             if user.state == '2':
@@ -498,7 +498,7 @@ def CustomMenu(request,para):
          "button":[
              {
                   "type":"view",
-                  "name":"快聊",
+                  "name":"配对",
                   "url": oauth2_url_0
               },
              {
@@ -527,7 +527,7 @@ def CustomMenu(request,para):
             "button":[
              {
                  "type":"click",
-                 "name":"快聊",
+                 "name":"配对",
                  "key":"chat"
               },
              {

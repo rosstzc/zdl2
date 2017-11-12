@@ -15,7 +15,7 @@
 {#        <script src="https://unpkg.com/vue"></script>#}
 
     <style type="text/css">
-        .weui_tabbar {
+        .weui-tabbar{
             position: fixed;
         }
         body {background-color: #f8f8f8}
@@ -186,6 +186,7 @@
                 </a>
         </div>
 
+{% if state == '1' %}
     <div class="weui-cells weui-cells_checkbox" id="match_type">
         <label class="weui-cell weui-check__label" for="s11">
             <div class="weui-cell__hd">
@@ -199,6 +200,7 @@
         </label>
 
     </div>
+{% endif %}
 {##}
 {#<div class="weui-tab">#}
 {#    <div class="weui-tab__panel">#}
@@ -211,7 +213,7 @@
     <div class="weui-tabbar">
         <a href="{{ url_site }}" class="weui-tabbar__item weui-bar__item_on">
             <img src="{{ url_site }}media/icon/icons8-Lightning Bolt_2.png" alt="" class="weui-tabbar__icon">
-            <p class="weui-tabbar__label">快聊</p>
+            <p class="weui-tabbar__label">配对</p>
         </a>
 
 
