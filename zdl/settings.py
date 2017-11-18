@@ -24,8 +24,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 if 'centos' in platform.platform():
     #线上
-    DEBUG = False
-    # DEBUG = True
+    # DEBUG = False
+    DEBUG = True
 else:
     #开发
     DEBUG = True
@@ -85,8 +85,9 @@ CRONJOBS = [
     ('1 21 * * *', 'chat.cron.chatNote'),   #给没有未读的人发每天提醒
     ('2 21 * * *', 'chat.cron.chatNote'),   #给没有未读的人发每天提醒
     ('3 21 * * *', 'chat.cron.chatNote'),   #给没有未读的人发每天提醒
-
-    ('* */1 * * *', 'chat.cron.serviceNote'),   #每小时一次
+    #
+    ('1 */1 * * *', 'chat.cron.serviceNote'),   #每小时一次
+    # ('*/1 * * * *', 'chat.cron.test'),
 
 ]
 

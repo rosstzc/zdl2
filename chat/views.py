@@ -31,7 +31,7 @@ from django.template.context import RequestContext
 # from leancloud.errors import LeanCloudError
 
 import base64,os
-import logging
+import logging,random
 import json
 import  datetime
 
@@ -53,47 +53,6 @@ def index(req):
     # todoo, 触发配对,日后也是要异步操作
     if req.method == 'POST':
 
-        #先找到所符合匹配条件的人
-        # sex = req.POST.get('sex') #配对性别要求
-        # user = leancloud.Object.extend('_User')
-        # query = user.query
-        # query.equal_to('state', '2')
-        # query.equal_to('sex', sex)
-        # queryResult = query.find()
-        #
-        # #todoo 今天匹配过的不重复匹配
-        # startTime = OnlineTime(8)
-        # chatRecord = leancloud.Object.extend('ChatRecord')
-        # query2 = chatRecord.query
-        # query3 = chatRecord.query
-        # query2.equal_to('sid',currentUser.uid)
-        # query2.greater_than_or_equal_to('startTime',startTime)
-        # query3.equal_to('rid',currentUser.uid)
-        # query3.greater_than_or_equal_to('startTime',startTime)
-        # result = leancloud.Query.or_(query2,query3)
-        # # result = query2.find()
-        # #todoo 把user查询结果与聊天记录表校验，
-        # rid = 0
-        # for i in queryResult:
-        #     k = 0
-        #     for j in result:
-        #         if i.uid == j.get('sid') or i.uid == j.get('rid'):
-        #             k = k + 1
-        #     if k == 0:
-        #         rid = i.uid
-        #         break
-        #
-        # #没匹配到,提示没找到
-        # if rid == 0:
-        #     print ('random_not_match')
-        #
-        #     return
-        # else:
-        #     print ('random_match')
-        #     record = chatRecord()
-        #     record.set('sid',currentUser.uid)
-        #     record.set('rid',rid)
-        #     record.set('close','0')
         return
 
     #get方法
@@ -175,11 +134,18 @@ def index(req):
                         chat.save()
 
                         my.state = '3'
-                        my.score_today = str(int(my.score_today) - 1)
+                        if int(my.score_today) > 0:
+                            my.score_today = str(int(my.score_today) - 1)
+                        else:
+                            my.score_forever = str(int(my.score_forever) - 1)
                         my.score_sum = str(int(my.score_sum) + 1)
                         my.save()
+
                         user_chat.state = '3'
-                        user_chat.score_today = str(int(user_chat.score_today) - 1)
+                        if int(user_chat.score_today) == 0:
+                            user_chat.score_forever = str(int(user_chat.score_forever) - 1)
+                        else:
+                            user_chat.score_today = str(int(user_chat.score_today) - 1)
                         user_chat.score_sum = str(int(user_chat.score_sum) + 1)
                         user_chat.save()
 
@@ -207,8 +173,6 @@ def index(req):
                         return response
 
 
-
-
         #退出聊天
         if action == 'leave':
             if my.state == '3':
@@ -231,7 +195,7 @@ def index(req):
                     resMsgA = '【系统消息】你已退出聊天'
                     PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
 
-                    resMsgB = '【系统消息】对方已退出聊天'
+                    resMsgB = '【系统消息】' + my.name + ' 已退出聊天'
                     PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
 
             if my.state == '2':
@@ -254,6 +218,12 @@ def index(req):
         my.save()
 
 
+        # 如果状态1或2，可以看到最近活跃用户
+        user_active = '0'
+        if my.state == '1' or my.state == '2':
+            user_active = activeUsers(my, 3)
+
+
         #如果状态是"聊天中"，
         url_info = ''
         user_chat = ''
@@ -272,9 +242,10 @@ def index(req):
         url_gochat = GetSiteUrl(req) + '?action=gochat'
         url_leave = GetSiteUrl(req) + '?action=leave'
         unreadSum = getUnreadSum(req)
+        url_daqi = GetSiteUrl(req) + 'invite?action=daqi&uid=' + str(uid)
         content = {'my': my, 'user_chat':user_chat, 'state':my.state,
                    'url_gochat':url_gochat, 'url_leave':url_leave, 'url_info':url_info, 'url_site':url_site,
-                   'score_available':score_aviable, 'unreadSum':unreadSum}
+                   'score_available':score_aviable, 'unreadSum':unreadSum, 'user_active':user_active, 'url_daqi':url_daqi}
         response = render(req, 'chat/chat.html', content)
         return response
 
@@ -296,6 +267,32 @@ def index(req):
     #API方案: 前端js调用api获取数据，然后js渲染内容
 
 
+#随机获取活跃用户
+def activeUsers(my,count):
+    start = OnlineTime(24)
+    if my.sex == '2':
+        user = User.objects.filter(time_login_today__gt=start).order_by('time_login_today').exclude(id=my.id)[:50]
+        print(user.count())
+    else:
+        if my.sex == '0':
+            sex = '1'
+        else:
+            sex = '0'
+        user = User.objects.filter(time_login_today__gt=start).filter(sex=sex).order_by('time_login_today').exclude(id=my.id)[:50]
+        # print(user.count())
+    if user.count() > count:
+        user = random.sample(user, count)
+    return user
+
+
+def activeList(req):
+    uid = req.COOKIES.get('UID')
+    my  = User.objects.get(id=uid)
+    user = activeUsers(my, 6)
+    site_url = GetSiteUrl(req)
+    content = {'my': my, 'user':user, 'site_url':site_url}
+    response = render(req, 'message/active_list.html', content)
+    return response
 
 
 
@@ -425,6 +422,7 @@ class Login(View):
         if user.count() > 0:
             user = user[0]
             user.time_login_today = GetTimeNow()
+            user.state = '1'
             user.save()
             response = HttpResponseRedirect(reverse('index'))
             # response.set_cookie('wname', user.get('wname'), max_age=10000000000)
@@ -701,9 +699,18 @@ def chatReminder():
     return
 
 
+#更新假用户的登录数据
+def updateFakeUserLoginTime():
+    uidArray = [4,5,6]
+    user = User.objects.filter(id__in=uidArray)
+    time = GetTimeNow()
+    user.update(time_login_today = time)
+
 
 #服务超时提醒,每小时检查一次
 def serviceRemind():
+    updateFakeUserLoginTime()
+
     token = GetAccessToken()
     start1 = OnlineTime(48)
     start2 = OnlineTime(36)
@@ -738,6 +745,15 @@ def test(req):
     return response
 
 
+def test3(req):
+    test2()
+    return HttpResponse('1')
+
+def test2():
+    user = User(username='444')
+    user.save()
+    print ('123')
+    return
 
 
 def tick2():

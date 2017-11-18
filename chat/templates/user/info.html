@@ -41,7 +41,7 @@
                 $('#sexText').text('男');
             }
             else if (sexValue === 2) {
-                sex.text('其他');
+                sex.text(' ');
                 $('#sexText').text('其他');
             }
 
@@ -159,8 +159,8 @@
                 <h3 class="weui-media-box__title">{{ user.name }}</h3>
                 <p class="weui-media-box__desc">
 {#                    男，20~30，星座#}
-                    <span id="sex"></span>,
-                    <span id="age"></span>,
+                    <span id="sex"></span>
+                    <span id="age"></span>
                     <span>{{ user.xingzuo }}</span>
                 </p>
 
@@ -176,12 +176,12 @@
 
     <div class="weui-cells__title">个人信息</div>
     <div class="weui-cells">
-        <div class="weui-cell">
-            <div class="weui-cell__bd" >
-                <p class="item">在线状态</p>
-            </div>
-            <div class="weui-cell__ft, desc">在线</div>
-        </div>
+{#        <div class="weui-cell">#}
+{#            <div class="weui-cell__bd" >#}
+{#                <p class="item">在线状态</p>#}
+{#            </div>#}
+{#            <div class="weui-cell__ft, desc">在线</div>#}
+{#        </div>#}
         <div class="weui-cell">
             <div class="weui-cell__bd" >
                 <p class="item">性别</p>

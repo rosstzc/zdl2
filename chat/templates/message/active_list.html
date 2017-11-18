@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>最近活跃</title>
+    <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
+    <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
+
+{#    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>#}
+{#        <script src="https://unpkg.com/vue"></script>#}
+
+
+
+    <style type="text/css">
+        .weui-tabbar{
+            position: fixed;
+        }
+        body {background-color: #f8f8f8}
+    </style>
+
+
+
+</head>
+
+<body>
+
+<div class="page__bd" style="height: 100%;">
+        <div class="weui-tab">
+            <div class="weui-panel__hd">最近活跃用户</div>
+            <div class="weui-panel__bd">
+            {% for i in user %}
+                <a href="{{ site_url }}user/{{ i.id }}" class="weui-media-box weui-media-box_appmsg">
+                    <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
+                        <img  src="{{ i.image_url }}" style="width: 58px;height: 58px;display: block">
+                    </div>
+                    <div class="weui-media-box__bd">
+                        <h4 class="weui-media-box__title">{{ i.name }}</h4>
+{#                    <span ="sex"></span><span> </span><span id="age"></span>#}
+                        <p class="weui-media-box__desc">{{ i.introduction }}</p>
+{#                        <p class="weui-media-box__desc">{{ i.i.time }}</p>#}
+                    </div>
+                        <div class="weui-cell__ft">></div>
+                </a>
+
+            {% endfor %}
+            </div>
+        </div>
+
+        <div ><a href="{{ site_url }}active-list"  class="weui-btn weui-btn_plain-primary" style="width: 100px" >换一批</a>  </div>
+<br>
+        <div ><a href="{{ site_url }}"  class="weui-btn weui-btn_plain-primary" style="width: 100px" >回首页</a>  </div>
+</div>
+
+<br>
+<br>
+</body>
+</html>
+
+

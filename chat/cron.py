@@ -9,12 +9,10 @@ from views import *
 
 # 9点开始，每分钟执行
 def test():
-    # user = User(username='444')
-    # user.save()
-
+    test2()
     # unreadReminder()
     # chatReminder()
-    print ('123')
+
 
 
 def unreadNote():
@@ -33,3 +31,5 @@ def oneMin():
 
 def serviceNote():
     serviceRemind()
+
+

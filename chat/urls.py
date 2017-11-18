@@ -25,9 +25,9 @@ urlpatterns = [
     #message
     url(r'^chat-list/$', views.chatList, name='chatList'),
     url(r'^message/(?P<rid>.{1,50})/$', views.showMessage, name='showMessage'),
+    url(r'^active-list/$', views.activeList, name='chatList'),
 
     #manage
-
     url(r'^manage/login/$', views.manageLogin, name=''),
     url(r'^manage/timer/$', views.timer, name=''),
     url(r'^manage/list-active-user/$', views.manageListActiveUser, name=''),
@@ -48,6 +48,7 @@ urlpatterns = [
 
 
     url(r'^test/$', views.test, ),
+    url(r'^test3/$', views.updateFakeUserLoginTime, ),
 
     #message
 
