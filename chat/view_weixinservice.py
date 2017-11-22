@@ -167,10 +167,11 @@ def responseMsg(request):
             # plus.save()
 
             #以小秘书名义给用户发一条欢迎私信
-            temp = '欢迎到[九点聊天]，完善的个人档案让你更受青睐，请点"我的/头像"进入更新资料。'
+            temp = '欢迎到九点聊天，点菜单【配对】就可去聊天，给相册放些照片会更受欢迎。 有疑问请给我留言哦...'
             saveMessage(request, 1, uid, temp,'0')
 
-            content = '欢迎到[九点聊天]，点我去完善的个人档案让你更受青睐，用心聊天，开心聊天！'
+            # content = '欢迎到[九点聊天]，点我去完善的个人档案让你更受青睐，用心聊天，开心聊天！'
+            content = '欢迎 '+ user.name +' ，点菜单【配对】去聊天 ；点【我的】给相册添加照片.'
             # url = GetSiteUrl(request) + 'modify/' + str(uid) + '/?W_NAME=' + W_NAME
             # replyContent =content + '\n据统计，资料完善的用户更受青睐，请点<a href="' +str(url) + '">完善你的资料</a> 。\n（注：链接是包含隐私信息，切勿转发给TA人）'
             # return getReplyXml(msg,replyContent)

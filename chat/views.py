@@ -57,8 +57,6 @@ def index(req):
 
     #get方法
     else:
-
-
         #微信触发带登录特性的页面
         W_NAME = req.GET.get('W_NAME')
         if W_NAME:
@@ -121,7 +119,8 @@ def index(req):
                             if i.id == j.sid_id or i.id == j.rid_id:
                                 k = k + 1
                         #如果最近没有聊过,就取这个
-                        if k == 0  or k == 1:
+                        # if k == 0  or k == 1:   # 2次
+                        if k == 0 :  # 1次
                             key = 1
                             user_chat = user[x]
                             break
@@ -220,8 +219,8 @@ def index(req):
 
         # 如果状态1或2，可以看到最近活跃用户
         user_active = '0'
-        if my.state == '1' or my.state == '2':
-            user_active = activeUsers(my, 3)
+        # if my.state == '1' or my.state == '2':
+        #     user_active = activeUsers(my, 3)
 
 
         #如果状态是"聊天中"，
@@ -237,6 +236,7 @@ def index(req):
             # content = {'my': my, 'user_chat':user_chat, 'state':'3'}
             # response = render(req, 'chat/chat.html', content)
             # return response
+        nine = check21PM(req)
         score_aviable = int(my.score_today) + int(my.score_forever)
         url_site = GetSiteUrl(req)
         url_gochat = GetSiteUrl(req) + '?action=gochat'
@@ -245,8 +245,11 @@ def index(req):
         url_daqi = GetSiteUrl(req) + 'invite?action=daqi&uid=' + str(uid)
         content = {'my': my, 'user_chat':user_chat, 'state':my.state,
                    'url_gochat':url_gochat, 'url_leave':url_leave, 'url_info':url_info, 'url_site':url_site,
-                   'score_available':score_aviable, 'unreadSum':unreadSum, 'user_active':user_active, 'url_daqi':url_daqi}
+                   'score_available':score_aviable, 'unreadSum':unreadSum, 'user_active':user_active, 'url_daqi':url_daqi, 'nine':nine}
         response = render(req, 'chat/chat.html', content)
+        # 非9点后就写cookie
+        if action == 'gochat' and nine == 0:
+            response.set_cookie('nine', nine, max_age=3600)
         return response
 
 
@@ -266,6 +269,16 @@ def index(req):
     #当前方案：本方法内调用获取登录后user数据，然后python渲染内容，包括写cookie
     #API方案: 前端js调用api获取数据，然后js渲染内容
 
+
+#检查是否到晚上9点
+def check21PM(req):
+    hour = datetime.datetime.now().strftime("%H")
+    true = 0
+    if int(hour) == 21 or int(hour) == 22 or int(hour) == 23 or int(hour) == 24 or int(hour) == 0:
+        true = 1
+    elif req.COOKIES.get('nine') == '0':
+        true = 1
+    return true
 
 #随机获取活跃用户
 def activeUsers(my,count):
@@ -559,6 +572,22 @@ def my(req):
 
     uid = req.COOKIES.get('UID')
     my = User.objects.get(id=uid)
+
+    #关闭通知
+    remind_day_close = req.GET.get('remind_day_close')
+    remind_unread_close = req.GET.get('remind_unread_close')
+    if remind_day_close or remind_unread_close:
+        if remind_day_close == '1':
+            my.remind_day_close = '1'
+        elif remind_day_close == '0':
+            my.remind_day_close = '0'
+
+        if remind_unread_close == '1':
+            my.remind_unread_close = '1'
+        elif remind_unread_close == '0':
+            my.remind_unread_close = '0'
+        my.save()
+
     score_aviable = int(my.score_today) + int(my.score_forever)
     url_site = GetSiteUrl(req)
     url_info = GetSiteUrl(req) + 'user/' + uid
@@ -657,7 +686,7 @@ def modifyInfo(req):
 
 
 
-#9：00、9：01触发未读提醒，只查询最近两天未读消息量。 （先触发这个10次，再触发下一个方法10次）
+#9：00、9：01触发未读提醒，只查询最近两天未读消息量。
 def unreadReminder():
     token = GetAccessToken()
     chat = ChatList.objects.select_related().filter(time__gt=OnlineTime(48)).exclude(unread=0)
@@ -676,11 +705,12 @@ def unreadReminder():
                 break
 
         for i in temp:
-            text = '【系统消息】你有未读留言，请点底部菜单[留言]查看'
-            PostMessge(token, str(PostText(i.W_NAME, text)))
-            i.remind_time = GetTimeNow()
-            i.save()
-            print('给用户id：'+ str(i.id) +'发送未读提醒')
+            text = '【温馨提醒】你有未读留言，请点底部菜单[留言]查看...关闭提醒请点[我的]设置。'
+            if i.remind_unread_close != '1':
+                PostMessge(token, str(PostText(i.W_NAME, text)))
+                i.remind_time = GetTimeNow()
+                i.save()
+                print('给用户id：'+ str(i.id) +'发送未读提醒')
     return
 
 
@@ -692,16 +722,19 @@ def chatReminder():
     token = GetAccessToken()
     if users.count() > 0:
         for i in users:
-            text = '【系统消息】晚上好，我们在#九点聊天#等你，听听你的故事'
-            PostMessge(token, str(PostText(i.W_NAME, text)))
-            i.remind_time = GetTimeNow()
-            i.save()
+            # text = '【温馨提醒】晚上好，我们在#九点聊天#等你，听听你的故事'
+            if i.remind_day_close != '1':
+                text = '【温馨提醒】有空吗？一起来聊聊天...关闭提醒请点[我的]设置。'
+                PostMessge(token, str(PostText(i.W_NAME, text)))
+                i.remind_time = GetTimeNow()
+                i.save()
     return
 
 
 #更新假用户的登录数据
 def updateFakeUserLoginTime():
-    uidArray = [4,5,6]
+    # uidArray = [4,5,6]
+    uidArray = [0]
     user = User.objects.filter(id__in=uidArray)
     time = GetTimeNow()
     user.update(time_login_today = time)
@@ -709,7 +742,7 @@ def updateFakeUserLoginTime():
 
 #服务超时提醒,每小时检查一次
 def serviceRemind():
-    updateFakeUserLoginTime()
+    # updateFakeUserLoginTime()
 
     token = GetAccessToken()
     start1 = OnlineTime(48)

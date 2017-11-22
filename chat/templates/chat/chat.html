@@ -82,6 +82,28 @@
                 return false
             });
 
+
+            //去匹配, 如果nine是1，表示在9点或以后，就不会提示
+            goMatch = $("#goMatch");
+            goMatch.click(function () {
+                nine={{ nine }};
+                if (nine === 0) {
+                    $iosDialog2 = $("#iosDialog2");
+                    $iosDialog2.fadeIn(200);
+                }
+                else {
+                    location.href="{{ url_gochat }}";
+                }
+            });
+
+            knowIT = $("#knowIt");
+            knowIT.click(function () {
+                location.href="{{ url_gochat }}";
+            });
+
+
+
+            //去聊天
             gochat = $("#gochat");
             gochat.click(function () {
                 WeixinJSBridge.call('closeWindow');
@@ -94,6 +116,9 @@
 {#                }#}
 {#             });#}
             });
+
+
+
 
         })
     </script>
@@ -129,7 +154,7 @@
             <img src="{{  url_site }}media/icon/icons8_2100.png" alt=""  class="" style="padding-top: 50px;padding-bottom: 40px" >
         </div>
 
-        <div ><a href="{{ url_gochat }}"  class="weui-btn weui-btn_plain-primary" style="width: 200px" >快速匹配</a>  </div>
+        <div ><a href="javascript:;"  class="weui-btn weui-btn_plain-primary" style="width: 200px" id="goMatch" >快速匹配</a>  </div>
 
         </div>
 
@@ -138,7 +163,7 @@
             <div class="weui-msg__icon-area"><i class="weui-icon-waiting weui-icon_msg"></i></div>
             <div class="weui-msg__text-area">
                 <h2 class="weui-msg__title">匹配中，请留意微信提醒</h2>
-                <p class="weui-msg__desc">网友都比较忙，系统自动匹配30分钟</p>
+                <p class="weui-msg__desc">网友都比较忙，系统为你自动匹配30分钟</p>
             </div>
         </div>
         <br>
@@ -215,7 +240,7 @@
 {#    </a>#}
 {#{% endif %}#}
 
-{% if user_active != 0 and state == '1' and user_active.count > 5 %}
+{% if user_active != '0' and state == '1' and user_active.count > 5 %}
 <div class="weui-cells weui-cells_form">
     <a href="{{ url_site }}active-list/">
         <div class="weui-cell">
@@ -295,6 +320,20 @@
             </div>
         </div>
     </div>
+
+
+        <!--BEGIN dialog2-->
+        <div class="js_dialog" id="iosDialog2" style="display: none;">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__bd">亲,大部分用户是晚上九点后登录，当前用户可能不多，请耐心等待或稍后再来</div>
+                <div class="weui-dialog__ft">
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary" id="knowIt">知道了</a>
+                </div>
+            </div>
+        </div>
+
+
 <br>
 <br>
 

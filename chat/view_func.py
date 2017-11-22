@@ -41,9 +41,9 @@ def GetAccessToken():
 def score_today(my):
     my.time_login_today = GetTimeNow()
     my.remind_key = "0"
-    my.score_today = '30'
+    my.score_today = '15'
     if my.sex == '0':
-        my.score_today = '50'
+        my.score_today = '30'
     my.save()
     return my
 

@@ -90,6 +90,9 @@ class User(models.Model):
     remind_key = models.CharField(max_length=10, default='0',blank=True)  #用户48小时服务到期提醒
     remind_time = models.CharField(max_length=100,blank=True)   #用于每天未读提醒、推送
     unread = models.CharField(max_length=10, default='0',blank=True)
+
+    remind_day_close = models.CharField(max_length=10, default='0',blank=True)
+    remind_unread_close = models.CharField(max_length=10, default='0',blank=True)
     # headimgurl = models.CharField(max_length=500, blank=True)
     # unionid = models.CharField(max_length=200, blank=True)
     #

@@ -6,6 +6,10 @@
     <title>我的</title>
     <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
     <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js
+"></script>
+
 
 {#    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>#}
 {#        <script src="https://unpkg.com/vue"></script>#}
@@ -14,7 +18,54 @@
         body {background-color: #f8f8f8}
     </style>
 
+    <script>
+         $(document).ready(function() {
+           unread_remind = $('#unread_remind');
+           remind = $('#remind');
+
+           key_unread_remind = '{{ my.remind_unread_close }}' ;
+           key_remind = '{{ my.remind_day_close}}' ;
+
+{#           if (key_unread_remind === '1' ){#}
+{#               unread_remind.attr("checked",true);#}
+{#           }#}
+{#           if (key_remind === '1' ){#}
+{#               remind.attr("checked",true);#}
+{#           }#}
+
+
+           //异步触发关闭未读题型
+           unread_remind.click(function() {
+               if (key_unread_remind === '1') {
+                   url = '{{ url_site }}' + 'my?remind_unread_close=0';
+                    $.get(url, function(result){
+                    });
+               }
+               else {
+                   url = '{{ url_site }}' + 'my?remind_unread_close=1';
+                    $.get(url, function(result){
+                    });
+               }
+            });
+           remind.click(function() {
+               if (key_remind === '1') {
+                   url = '{{ url_site }}' + 'my?remind_day_close=0';
+                    $.get(url, function(result){
+                    });
+               }
+               else {
+                   url = '{{ url_site }}' + 'my?remind_day_close=1';
+                    $.get(url, function(result){
+                    });
+               }
+             });
+
+         })
+    </script>
+
 </head>
+
+
 
 
 <body >
@@ -58,12 +109,10 @@
         </a>
         <a class="weui-cell weui-cell_access" href="{{ url_site }}score-desc/">
             <div class="weui-cell__bd">
-                <p>积分说明 </p>
+                <p>积分说明/购买 </p>
             </div>
-            <div class="weui-cell__ft"></div>
+                <div class="weui-cell__ft">可用积分：{{ score_aviable }}</div>
         </a>
-
-
 </div>
     <div></div>
 
@@ -74,13 +123,31 @@
 {#                </div>#}
 {#                <div class="weui-cell__ft">ff</div>#}
 {#            </a>#}
-            <a class="weui-cell weui-cell_access" href="{{ url_site }}score-desc/">
-                <div class="weui-cell__bd">
-                    <p>购买积分</p>
-                </div>
-                <div class="weui-cell__ft">可用积分：{{ score_aviable }}</div>
-            </a>
 
+
+    <div class="weui-cell weui-cell_switch">
+                <div class="weui-cell__bd">关闭未读留言提醒</div>
+                <div class="weui-cell__ft">
+{#                    <input class="weui-switch" type="checkbox" checked="checked">#}
+                    {% if my.remind_unread_close == '1' %}
+                        <input class="weui-switch" type="checkbox" id="unread_remind"  checked="checked">
+                    {% else %}
+                        <input class="weui-switch" type="checkbox" id="unread_remind" >
+
+                    {% endif %}
+
+                </div>
+    </div>
+    <div class="weui-cell weui-cell_switch">
+                <div class="weui-cell__bd">关闭每天九点聊天提醒</div>
+                <div class="weui-cell__ft">
+                    {% if my.remind_day_close == '1' %}
+                    <input class="weui-switch" type="checkbox" id="remind" checked="checked">
+                    {% else %}
+                    <input class="weui-switch" type="checkbox" id="remind" >
+                    {% endif %}
+                </div>
+    </div>
 </div>
 
 
