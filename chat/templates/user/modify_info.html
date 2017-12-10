@@ -35,28 +35,28 @@
                 picker.text('其他');
             }
 
-
-            picker.click(function () {
-                    weui.picker([{
-                        label: '女',
-                        value: 0
-                    }, {
-                        label: '男',
-                        value: 1
-                    }, {
-                        label: '其他',
-                        value: 2
-                    }], {
-                        onChange: function (result) {
-                            console.log(result);
-                        },
-                        onConfirm: function (result) {
-                            sexInput.val(result);  //赋值
-                            picker.text(result[0].label);  //取label
-                            console.log(result);
-                     }
-                    });
-            });
+            //不允许修改性别
+{#            picker.click(function () {#}
+{#                    weui.picker([{#}
+{#                        label: '女',#}
+{#                        value: 0#}
+{#                    }, {#}
+{#                        label: '男',#}
+{#                        value: 1#}
+{#                    }, {#}
+{#                        label: '其他',#}
+{#                        value: 2#}
+{#                    }], {#}
+{#                        onChange: function (result) {#}
+{#                            console.log(result);#}
+{#                        },#}
+{#                        onConfirm: function (result) {#}
+{#                            sexInput.val(result);  //赋值#}
+{#                            picker.text(result[0].label);  //取label#}
+{#                            console.log(result);#}
+{#                     }#}
+{#                    });#}
+{#            });#}
 
 
 

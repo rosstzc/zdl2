@@ -87,7 +87,7 @@ CRONJOBS = [
     ('3 21 * * *', 'chat.cron.chatNote'),   #给没有未读的人发每天提醒
     #
     ('1 */1 * * *', 'chat.cron.serviceNote'),   #每小时一次
-    # ('*/1 * * * *', 'chat.cron.test'),
+    ('*/1 * * * *', 'chat.cron.minCheck'),  #每分钟check1次
 
 ]
 

@@ -153,9 +153,14 @@
         <div align="center">
             <img src="{{  url_site }}media/icon/icons8_2100.png" alt=""  class="" style="padding-top: 50px;padding-bottom: 40px" >
         </div>
-
+        {% if my.sex == '1' %}
         <div ><a href="javascript:;"  class="weui-btn weui-btn_plain-primary" style="width: 200px" id="goMatch" >快速匹配</a>  </div>
-
+        {% else %}
+            <div  >
+                <div><a href="javascript:;"  class="weui-btn weui-btn_plain-primary" style="width: 150px" id="goMatch" >快速匹配</a>  </div>
+{#                <div style="float: right;"><a href="javascript:;"  class="weui-btn weui-btn_plain-primary" style="width: 150px" id="goMatch" >快速匹配</a>  </div>#}
+            </div>
+        {% endif %}
         </div>
 
     {% elif state == '2' %}  {# 匹配中 #}

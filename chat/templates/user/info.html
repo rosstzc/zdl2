@@ -88,6 +88,30 @@
                 $gallery.fadeOut(100);
             });
 
+
+            // 女孩主动配对
+            getMatch = $("#getMatch");
+            $iosDialog2 = $('#iosDialog2');
+            $iosDialog3 = $('#iosDialog3');
+            getMatch.click(function () {
+                $.get("{{ url_gochat }}",function(data,status){
+{#                    alert("数据：" + data + "\n状态：" + status);#}
+                    if (data === '1') {
+                        $iosDialog2.fadeIn(200);
+                    }else {
+                        $iosDialog3.fadeIn(200);
+                    }
+                 });
+            });
+            $("#match").click(function () {
+{#                alert('233');#}
+                WeixinJSBridge.call('closeWindow');
+            });
+            $("#noMatch").click(function () {
+{#                alert('2344');#}
+                window.location.reload();
+            });
+
         })
     </script>
 
@@ -171,6 +195,26 @@
         <div style="float: right; margin-right: 15px; margin-top: 20px">
             <a href="{{ url }}" class="weui-btn weui-btn_mini weui-btn_primary">完善资料</a>
         </div>
+        {% else %}
+        <div style="float: right; margin-right: 15px; margin-top: 20px">
+            <a href="{{ message_url }}" class="weui-btn weui-btn_mini weui-btn_default">留言</a>
+        </div>
+
+            <!-- 如果用户自己是男的，则显示 送花-->
+                {%  if my.sex == '1' %}
+            <div style="float: right; margin-right: 15px; margin-top: 20px">
+                <a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_primary">送花</a>
+            </div>
+                {% endif %}
+
+{#            <!-- 如果自己是女的，并且对方的状态时配对状态-->#}
+                {%  if my.sex == '0' and user.state == '2'%}
+            <div style="float: right; margin-right: 15px; margin-top: 20px">
+                <a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_primary" id="getMatch">配对他</a>
+            </div>
+                {% endif %}
+
+
         {% endif %}
     </div>
 
@@ -224,8 +268,28 @@
     <br>
     <br>
 
-
-
+        <!--BEGIN dialog2-->
+        <div class="js_dialog" id="iosDialog2" style="display: none;">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__bd">已配对TA，点[确定]到微信聊天</div>
+                <div class="weui-dialog__ft">
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary" id="match">确定</a>
+                </div>
+            </div>
+        </div>
+        <!--END dialog2-->
+        <!--BEGIN dialog2-->
+        <div class="js_dialog" id="iosDialog3" style="display: none;">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__bd">对方不在配对状态，请稍候再试</div>
+                <div class="weui-dialog__ft">
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary" id="noMatch">知道了</a>
+                </div>
+            </div>
+        </div>
+        <!--END dialog2-->
 </body>
 </html>
 

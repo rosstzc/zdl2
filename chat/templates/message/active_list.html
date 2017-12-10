@@ -26,6 +26,36 @@
 <body>
 
 <div class="page__bd" style="height: 100%;">
+
+    <!-- 仅女性可见-->
+    {% if my.sex == '0' and user_match.count > 0 %}
+        <div class="weui-tab">
+            <div class="weui-panel__hd">女性特权：自主选择正在配对中的男生</div>
+            <div class="weui-panel__bd">
+            {% for i in user_match %}
+                <a href="{{ site_url }}user/{{ i.id }}" class="weui-media-box weui-media-box_appmsg">
+                    <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
+                        <img  src="{{ i.image_url }}" style="width: 58px;height: 58px;display: block">
+                    </div>
+                    <div class="weui-media-box__bd">
+                        <h4 class="weui-media-box__title">{{ i.name }}</h4>
+{#                    <span ="sex"></span><span> </span><span id="age"></span>#}
+                        <p class="weui-media-box__desc">{{ i.introduction }}</p>
+{#                        <p class="weui-media-box__desc">{{ i.i.time }}</p>#}
+                    </div>
+                    <!-- 如果是自己时女性，就可以看到配对中的男性-->
+                    {% if  i.state == '2'%}
+                        <div class="weui-cell__ft">配对中 ></div>
+                    {% else %}
+                        <div class="weui-cell__ft">></div>
+                    {% endif %}
+                </a>
+            {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+
         <div class="weui-tab">
             <div class="weui-panel__hd">最近活跃用户</div>
             <div class="weui-panel__bd">
@@ -40,15 +70,19 @@
                         <p class="weui-media-box__desc">{{ i.introduction }}</p>
 {#                        <p class="weui-media-box__desc">{{ i.i.time }}</p>#}
                     </div>
+                    <!-- 如果是自己时女性，就可以看到配对中的男性-->
+                    {% if my.sex == '0' and i.state == '2'%}
+                        <div class="weui-cell__ft">配对中 ></div>
+                    {% else %}
                         <div class="weui-cell__ft">></div>
+                    {% endif %}
                 </a>
-
             {% endfor %}
             </div>
         </div>
 
-        <div ><a href="{{ site_url }}active-list"  class="weui-btn weui-btn_plain-primary" style="width: 100px" >换一批</a>  </div>
-<br>
+{#        <div ><a href="{{ site_url }}active-list"  class="weui-btn weui-btn_plain-primary" style="width: 100px" >换一批</a>  </div>#}
+{#<br>#}
         <div ><a href="{{ site_url }}"  class="weui-btn weui-btn_plain-primary" style="width: 100px" >回首页</a>  </div>
 </div>
 

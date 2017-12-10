@@ -32,4 +32,5 @@ def oneMin():
 def serviceNote():
     serviceRemind()
 
-
+def minCheck():
+    checkMin()

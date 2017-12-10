@@ -128,45 +128,47 @@ def index(req):
 
                     #匹配到
                     if key == 1:
-                        time = GetTimeNow()
-                        chat = Chat(sid_id=user_chat.id, rid_id=uid, mode='1', time=time, close='0')
-                        chat.save()
+                        getMatchLogic(my,user_chat,req)
 
-                        my.state = '3'
-                        if int(my.score_today) > 0:
-                            my.score_today = str(int(my.score_today) - 1)
-                        else:
-                            my.score_forever = str(int(my.score_forever) - 1)
-                        my.score_sum = str(int(my.score_sum) + 1)
-                        my.save()
-
-                        user_chat.state = '3'
-                        if int(user_chat.score_today) == 0:
-                            user_chat.score_forever = str(int(user_chat.score_forever) - 1)
-                        else:
-                            user_chat.score_today = str(int(user_chat.score_today) - 1)
-                        user_chat.score_sum = str(int(user_chat.score_sum) + 1)
-                        user_chat.save()
-
-                        #线上环境
-                        if 'centos' in platform.platform():
-                            #給双方发微信推送告诉配对成功
-                            token = GetAccessToken()
-                            resMsgA = '【系统消息】刚刚为你匹配到 '+ user_chat.name + '，回复消息打个招呼，聊天请注意文明用语哦！ '
-                            # resMsgA = '已匹配到 '+ user_chat.name + '，你们可以开始对话 :> (' + link + '的主页)'
-                            PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
-
-                            resMsgA = '[' + user_chat.name + ']：您好 :>'
-                            PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
-
-
-                            link = getUserLink(req, my)
-                            resMsgB = '【系统消息】已匹配到 '+ my.name + '，回复消息打个招呼吧 :>  '
-                            # resMsgB = '已匹配到 '+ my.name + '，回复消息打个招呼吧 :> \n(' + link + '的主页)'
-                            PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
-
-                            resMsgB = '[' + my.name + ']：您好 :>'
-                            PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
+                        # time = GetTimeNow()
+                        # chat = Chat(sid_id=user_chat.id, rid_id=uid, mode='1', time=time, close='0')
+                        # chat.save()
+                        #
+                        # my.state = '3'
+                        # if int(my.score_today) > 0:
+                        #     my.score_today = str(int(my.score_today) - 1)
+                        # else:
+                        #     my.score_forever = str(int(my.score_forever) - 1)
+                        # my.score_sum = str(int(my.score_sum) + 1)
+                        # my.save()
+                        #
+                        # user_chat.state = '3'
+                        # if int(user_chat.score_today) == 0:
+                        #     user_chat.score_forever = str(int(user_chat.score_forever) - 1)
+                        # else:
+                        #     user_chat.score_today = str(int(user_chat.score_today) - 1)
+                        # user_chat.score_sum = str(int(user_chat.score_sum) + 1)
+                        # user_chat.save()
+                        #
+                        # #线上环境
+                        # if 'centos' in platform.platform():
+                        #     #給双方发微信推送告诉配对成功
+                        #     token = GetAccessToken()
+                        #     resMsgA = '【系统消息】刚刚为你匹配到 '+ user_chat.name + '，回复消息打个招呼，聊天请注意文明用语哦！ '
+                        #     # resMsgA = '已匹配到 '+ user_chat.name + '，你们可以开始对话 :> (' + link + '的主页)'
+                        #     PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
+                        #
+                        #     resMsgA = '[' + user_chat.name + ']：您好 :>'
+                        #     PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
+                        #
+                        #
+                        #     link = getUserLink(req, my)
+                        #     resMsgB = '【系统消息】已匹配到 '+ my.name + '，回复消息打个招呼吧 :>  '
+                        #     # resMsgB = '已匹配到 '+ my.name + '，回复消息打个招呼吧 :> \n(' + link + '的主页)'
+                        #     PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
+                        #
+                        #     resMsgB = '[' + my.name + ']：您好 :>'
+                        #     PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
 
                         response = HttpResponseRedirect(reverse('index'))
                         return response
@@ -205,22 +207,34 @@ def index(req):
 
 
         #如果状态是2，并且time_gochat时间超过30分钟，让状态回复1
-        if my.state == '2':
-            start = OnlineTime(0.5)
-            if my.time_gochat != None and my.time_gochat != '':
-                time_gochat = my.time_gochat
-                if time_gochat < start:
-                    my.state = '1'
-                    my.save()
+        my = updateState(my)
+        # if my.state == '2':
+        #     start = OnlineTime(0.5)
+        #     if my.time_gochat != None and my.time_gochat != '':
+        #         time_gochat = my.time_gochat
+        #         if time_gochat < start:
+        #             my.state = '1'
+        #             my.save()
         if my.introduction == '':
             my.introduction = "这家伙很懒，什么都没写"
         my.save()
 
 
+        #女生生成今天推荐的用户
+        if my.sex == '0':
+            #
+
+            return
+
+        #男生也收到相应推荐
+        if my.sex == '1':
+            return
+
+
         # 如果状态1或2，可以看到最近活跃用户
         user_active = '0'
-        # if my.state == '1' or my.state == '2':
-        #     user_active = activeUsers(my, 3)
+        if my.state == '1' or my.state == '2':
+            user_active = activeUsers(my, 3)
 
 
         #如果状态是"聊天中"，
@@ -254,6 +268,7 @@ def index(req):
 
 
 
+
     # #todoo，
     #  1） 用户发起配对时，修改state和记录触发时间（30s有效）。
     #  2）如果配对成功，修改state。
@@ -265,9 +280,64 @@ def index(req):
         # todoo 退出聊天/匹配/离开
 
 
-
     #当前方案：本方法内调用获取登录后user数据，然后python渲染内容，包括写cookie
     #API方案: 前端js调用api获取数据，然后js渲染内容
+
+
+def updateState(my):
+    if my.state == '2':
+        start = OnlineTime(0.5)
+        if my.time_gochat != None and my.time_gochat != '':
+            time_gochat = my.time_gochat
+            if time_gochat < start:
+                my.state = '1'
+                my.save()
+    return my
+
+
+#把配对逻辑提取岀来
+def getMatchLogic(my, user_chat,req):
+    uid = my.id
+    time = GetTimeNow()
+    chat = Chat(sid_id=user_chat.id, rid_id=uid, mode='1', time=time, close='0')
+    chat.save()
+
+    my.state = '3'
+    if int(my.score_today) > 0:
+        my.score_today = str(int(my.score_today) - 1)
+    else:
+        my.score_forever = str(int(my.score_forever) - 1)
+    my.score_sum = str(int(my.score_sum) + 1)
+    my.save()
+
+    user_chat.state = '3'
+    if int(user_chat.score_today) == 0:
+        user_chat.score_forever = str(int(user_chat.score_forever) - 1)
+    else:
+        user_chat.score_today = str(int(user_chat.score_today) - 1)
+    user_chat.score_sum = str(int(user_chat.score_sum) + 1)
+    user_chat.save()
+
+    # 线上环境
+    if 'centos' in platform.platform():
+        # 給双方发微信推送告诉配对成功
+        token = GetAccessToken()
+        resMsgA = '【系统消息】刚刚为你匹配到 ' + user_chat.name + '，回复消息打个招呼，聊天请注意文明用语哦！ '
+        # resMsgA = '已匹配到 '+ user_chat.name + '，你们可以开始对话 :> (' + link + '的主页)'
+        PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
+
+        resMsgA = '[' + user_chat.name + ']：您好 :>'
+        PostMessge(token, str(PostText(my.W_NAME, resMsgA)))
+
+        link = getUserLink(req, my)
+        resMsgB = '【系统消息】已匹配到 ' + my.name + '，回复消息打个招呼吧 :>  '
+        # resMsgB = '已匹配到 '+ my.name + '，回复消息打个招呼吧 :> \n(' + link + '的主页)'
+        PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
+
+        resMsgB = '[' + my.name + ']：您好 :>'
+        PostMessge(token, str(PostText(user_chat.W_NAME, resMsgB)))
+
+
 
 
 #检查是否到晚上9点
@@ -282,18 +352,22 @@ def check21PM(req):
 
 #随机获取活跃用户
 def activeUsers(my,count):
-    start = OnlineTime(24)
+    # start = OnlineTime(24)
     if my.sex == '2':
-        user = User.objects.filter(time_login_today__gt=start).order_by('time_login_today').exclude(id=my.id)[:50]
+        # user = User.objects.filter(time_login_today__gt=start).order_by('time_login_today').exclude(id=my.id)[:50]
+        user = User.objects.filter(time_login_today__gt='2017-10-30 00:00:17').order_by('-time_login_today').exclude(id=my.id)[:50]
         print(user.count())
     else:
         if my.sex == '0':
             sex = '1'
         else:
             sex = '0'
-        user = User.objects.filter(time_login_today__gt=start).filter(sex=sex).order_by('time_login_today').exclude(id=my.id)[:50]
+        # user = User.objects.filter(time_login_today__gt=start).filter(sex=sex).order_by('time_login_today').exclude(id=my.id)[:50]
+        user = User.objects.filter(time_login_today__gt='2017-10-30 00:00:17',sex=sex).order_by('-time_login_today').exclude(id=my.id)[:50]
         # print(user.count())
-    if user.count() > count:
+    if user.count() < count:
+        user = random.sample(user, user.count())
+    else:
         user = random.sample(user, count)
     return user
 
@@ -301,9 +375,12 @@ def activeUsers(my,count):
 def activeList(req):
     uid = req.COOKIES.get('UID')
     my  = User.objects.get(id=uid)
-    user = activeUsers(my, 6)
+    user = activeUsers(my, 50)
     site_url = GetSiteUrl(req)
-    content = {'my': my, 'user':user, 'site_url':site_url}
+
+    #女王选兵
+    user_match = User.objects.filter(sex='1', state='2',time_login_today__gt='2017-10-30 00:00:17').order_by('-time_gochat')[:50]
+    content = {'my': my, 'user':user, 'site_url':site_url, 'user_match':user_match}
     response = render(req, 'message/active_list.html', content)
     return response
 
@@ -521,12 +598,14 @@ def showMessage(req,rid):
         #对方名字
         userbName = User.objects.get(id=rid).name
         siteUrl = GetSiteUrl(req)
+        userUrl = siteUrl + 'user/' + rid
         result = Message.objects.select_related().\
             filter(Q(sid_id=uid, rid_id=rid) | Q(sid_id=rid,rid_id=uid)).order_by('-s_time')[:100]
 
     context = {'msgs': result,
                'name':userbName,
-               'siteUrl':siteUrl
+               'siteUrl':siteUrl,
+               'userUrl':userUrl
 
                }
     response = render(req, 'message/message.html', context)
@@ -538,12 +617,29 @@ def showMessage(req,rid):
 
 
 def userProfile(req,uid):
+    my_uid = req.COOKIES.get('UID')
+    my = User.objects.get(id=my_uid)
+
+    # 配对某用户,异步触发
+    action = req.GET.get('action')
+    if action == 'match':
+        user = User.objects.get(id=uid)
+        if user.state != '2':
+            return HttpResponse(0)
+        if user.state == '2' and my.state != '3':  #对方必须配对中，自己不能时配对中
+            getMatchLogic(my, user, req)
+            return HttpResponse(1) #配对成功
+        else:
+            return HttpResponse(0)
+
+
     user = User.objects.get(id=uid)
     imgs = UserImg.objects.filter(uid_id=uid)
     for i in imgs:
         i.image.name = GetSiteUrl(req) + 'media/' + i.image.name
     count = imgs.count()
-    my_uid = req.COOKIES.get('UID')
+
+    print (my.sex)
     # url_avatar = GetSiteUrl(req) + 'media/' + user.image1.name
     url_avatar = user.image_url
     myself = '0' #不是本人
@@ -554,7 +650,9 @@ def userProfile(req,uid):
         response = render(req, 'user/info.html', context)
         return response
 
-    context = {'user': user, 'imgs':imgs, 'url_avatar':url_avatar}
+    url_gochat = GetSiteUrl(req) + 'user/' + str(uid) + '?action=match'
+    message_url = GetSiteUrl(req) + 'message/' + str(uid)
+    context = {'user': user, 'imgs':imgs, 'url_avatar':url_avatar, 'my':my, 'message_url':message_url, 'url_gochat':url_gochat}
     response = render(req, 'user/info.html', context)
     return response
 
@@ -738,6 +836,38 @@ def updateFakeUserLoginTime():
     user = User.objects.filter(id__in=uidArray)
     time = GetTimeNow()
     user.update(time_login_today = time)
+
+
+def checkMin():
+
+    #更新状态
+    start = OnlineTime(0.5)
+    user = User.objects.filter(time_gochat__lt=start)
+    for i in user:
+        if i.state == '2':
+            if i.time_gochat != None and i.time_gochat != '':
+                time_gochat = i.time_gochat
+                if time_gochat < start:
+                    i.state = '1'
+                    i.save()
+
+    #检查30分钟没有动的对话
+    start = OnlineTime(0.5)
+    chat = Chat.objects.filter(close='0')
+    for i in chat:
+        result = ChatList.objects.filter(Q(sid_id=i.sid_id, rid_id=i.rid_id) | Q(sid=i.rid_id, rid=i.sid_id), time__lt=start)
+        if result.count() > 0:
+            result=result[0]
+            usera = result.sid
+            userb = result.rid
+            usera.state = '1'
+            usera.save()
+            userb.state ='1'
+            userb.save()
+        i.close = '1'
+        i.save()
+    return
+
 
 
 #服务超时提醒,每小时检查一次
