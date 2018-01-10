@@ -1,11 +1,17 @@
+备份my
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
-    <title>聊天列表</title>
+    <title>我的</title>
     <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
     <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery-cookie/1.4.1/jquery.cookie.min.js
+"></script>
+
 
 {#    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>#}
 {#        <script src="https://unpkg.com/vue"></script>#}
@@ -14,196 +20,164 @@
         body {background-color: #f8f8f8}
     </style>
 
+    <script>
+         $(document).ready(function() {
+           unread_remind = $('#unread_remind');
+           remind = $('#remind');
+
+           key_unread_remind = '{{ my.remind_unread_close }}' ;
+           key_remind = '{{ my.remind_day_close}}' ;
+
+{#           if (key_unread_remind === '1' ){#}
+{#               unread_remind.attr("checked",true);#}
+{#           }#}
+{#           if (key_remind === '1' ){#}
+{#               remind.attr("checked",true);#}
+{#           }#}
+
+
+           //异步触发关闭未读题型
+           unread_remind.click(function() {
+               if (key_unread_remind === '1') {
+                   url = '{{ url_site }}' + 'my?remind_unread_close=0';
+                    $.get(url, function(result){
+                    });
+               }
+               else {
+                   url = '{{ url_site }}' + 'my?remind_unread_close=1';
+                    $.get(url, function(result){
+                    });
+               }
+            });
+           remind.click(function() {
+               if (key_remind === '1') {
+                   url = '{{ url_site }}' + 'my?remind_day_close=0';
+                    $.get(url, function(result){
+                    });
+               }
+               else {
+                   url = '{{ url_site }}' + 'my?remind_day_close=1';
+                    $.get(url, function(result){
+                    });
+               }
+             });
+
+         })
+    </script>
+
 </head>
 
-<body>
 
 
-    <div class="container" id="app">
-{#      <h3 class="text-center">聊天列表</h3>#}
+
+<body >
+{#    <div class="container" id="app" >#}
+{#          <h3 class="text-center">我的</h3>#}
+{#        <div>用户id：{{ my.id }}</div>#}
 {##}
-{#        {% for i in chatList %}#}
-{#            <div>用户名：{{ i.sid.name }}</div>#}
-{#            <div>最近一条聊天记录：{{ i.content }}</div>#}
-{#            <div>时间：{{ i.time }}</div>#}
-{#            <div>---------------</div>#}
-{#        {% endfor %}#}
-    </div>
-
+{#        <div>用户名：{{ my.name }}</div>#}
+{#        <div>状态：{{ my.state }}</div>#}
+{#        <div>可用积分：{{ my.score_today }}</div>#}
+{#        <div><a href="{{ url_info }}"> 去我的资料</a></div>#}
+{#    </div>#}
+    <div class="weui-cells__title" style="margin-bottom: -10px; font-size: 10px">用户ID：{{ my.id }}</div>
 
     <div class="weui-panel weui-panel_access">
-            <div class="weui-panel__hd">聊过的</div>
-        <div class="weui-panel__bd">
-            {% for i in chatList %}
-                <a href="{{ i.url }}" class="weui-media-box weui-media-box_appmsg">
-                <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
-                    <img  src="{{ i.i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
-                    {% if i.i.unread != 0 %}
-                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
-                    {% endif %}
-                </div>
-                <div class="weui-media-box__bd">
-                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
-                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
-                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
-                </div>
-                                <div class="weui-cell__ft">></div>
+{#            <div class="weui-panel__hd">图文组合列表</div>#}
+            <div class="weui-panel__bd">
+                <a href="{{ url_info }}" class="weui-media-box weui-media-box_appmsg">
+                    <div class="weui-media-box__hd">
+                        <img class="weui-media-box__thumb" src="{{ my.image_url }}" alt="">
+                    </div>
+                    <div class="weui-media-box__bd">
+                        <h4 class="weui-media-box__title">{{ my.name }}</h4>
+                        <p class="weui-media-box__desc">{{ my.introduction }}</p>
+                    </div>
+                    <div class="weui-cell__ft">></div>
 
                 </a>
-
-
-                                <a href="{{ i.url }}" class="weui-media-box weui-media-box_appmsg">
-                <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
-                    <img  src="{{ i.i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
-                    {% if i.i.unread != 0 %}
-                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
-                    {% endif %}
-                </div>
-                <div class="weui-media-box__bd">
-                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
-                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
-                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
-                </div>
-                                <div class="weui-cell__ft">></div>
-
+                <a class="weui-cell weui-cell_access" href="{{ url_site }}modify-info/">
+                    <div class="weui-cell__bd">
+                        <p>去完善资料</p>
+                    </div>
+                    <div class="weui-cell__ft"></div>
                 </a>
 
+            </div>
 
-                                <a href="{{ i.url }}" class="weui-media-box weui-media-box_appmsg">
-                <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
-                    <img  src="{{ i.i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
-                    {% if i.i.unread != 0 %}
-                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
-                    {% endif %}
-                </div>
-                <div class="weui-media-box__bd">
-                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
-                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
-                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
-                </div>
-                                <div class="weui-cell__ft">></div>
-
-                </a>
-
-                                <a href="{{ i.url }}" class="weui-media-box weui-media-box_appmsg">
-                <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
-                    <img  src="{{ i.i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
-                    {% if i.i.unread != 0 %}
-                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
-                    {% endif %}
-                </div>
-                <div class="weui-media-box__bd">
-                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
-                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
-                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
-                </div>
-                                <div class="weui-cell__ft">></div>
-
-                </a>
-
-
-
-                                <a href="{{ i.url }}" class="weui-media-box weui-media-box_appmsg">
-                <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
-                    <img  src="{{ i.i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
-                    {% if i.i.unread != 0 %}
-                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
-                    {% endif %}
-                </div>
-                <div class="weui-media-box__bd">
-                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
-                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
-                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
-                </div>
-                                <div class="weui-cell__ft">></div>
-
-                </a>
-
-
-                                <a href="{{ i.url }}" class="weui-media-box weui-media-box_appmsg">
-                <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
-                    <img  src="{{ i.i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
-                    {% if i.i.unread != 0 %}
-                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
-                    {% endif %}
-                </div>
-                <div class="weui-media-box__bd">
-                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
-                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
-                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
-                </div>
-                                <div class="weui-cell__ft">></div>
-
-                </a>
-
-                                <a href="{{ i.url }}" class="weui-media-box weui-media-box_appmsg">
-                <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
-                    <img  src="{{ i.i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
-                    {% if i.i.unread != 0 %}
-                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
-                    {% endif %}
-                </div>
-                <div class="weui-media-box__bd">
-                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
-                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
-                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
-                </div>
-                                <div class="weui-cell__ft">></div>
-
-                </a>
-
-
-                                <a href="{{ i.url }}" class="weui-media-box weui-media-box_appmsg">
-                <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
-                    <img  src="{{ i.i.sid.image_url }}" style="width: 58px;height: 58px;display: block">
-                    {% if i.i.unread != 0 %}
-                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>
-                    {% endif %}
-                </div>
-                <div class="weui-media-box__bd">
-                    <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
-                    <p class="weui-media-box__desc">{{ i.i.content }}</p>
-                    <p class="weui-media-box__desc">{{ i.i.time }}</p>
-                </div>
-                                <div class="weui-cell__ft">></div>
-
-                </a>
-
-            {% endfor %}
-        </div>
 
     </div>
 
+    <div></div>
 
+<div class="weui-cells">
+        <a class="weui-cell weui-cell_access" href="{{ url_daqi }}">
+            <div class="weui-cell__bd">
+                <p>请朋友打气，送积分 <i class="weui-icon-success"></i></p>
+            </div>
+            <div class="weui-cell__ft"></div>
+        </a>
+        <a class="weui-cell weui-cell_access" href="{{ url_site }}score-desc/">
+            <div class="weui-cell__bd">
+                <p>积分说明/购买 </p>
+            </div>
+                <div class="weui-cell__ft">可用积分：{{ score_aviable }}</div>
+        </a>
+</div>
+    <div></div>
 
-
-    <!-- 备份，行高根据内容而改变高度-->
-{#    <div class="weui-panel weui-panel_access">#}
-{#        <div class="weui-panel__hd">聊过的</div>#}
-{##}
-{#        {% for i in chatList %}#}
-{#        <a href=" {{ i.url }}" class="">#}
-{#            <div class="weui-cell">#}
-{#                <div class="weui-cell__hd" style="position: relative;margin-right: 10px;">#}
-{#                    <img src="{{ i.i.sid.image_url }}" style="width: 50px;height: 50px;display: block">#}
-{#                    {% if i.i.unread != 0 %}#}
-{#                    <span class="weui-badge" style="position: absolute;top: -5px;right: -.4em;">{{ i.i.unread }}</span>#}
-{#                    {% endif %}#}
-{#                </div>#}
+<div class="weui-cells">
+{#            <a class="weui-cell weui-cell_access" href="javascript:;">#}
 {#                <div class="weui-cell__bd">#}
-{#                    <p>{{ i.i.sid.name }}</p>#}
-{#                    <p style="font-size: 13px;color: #888888;">{{ i.i.content }}</p>#}
-{#                    <p style="font-size: 13px;color: #888888;">{{ i.i.time }}</p>#}
+{#                    <p>购买金币</p>#}
 {#                </div>#}
-{#                <div class="weui-cell__ft">></div>#}
-{#            </div>#}
-{#        </a>#}
-{#        {% endfor %}#}
-{#    </div>#}
+{#                <div class="weui-cell__ft">ff</div>#}
+{#            </a>#}
 
 
+    <div class="weui-cell weui-cell_switch">
+                <div class="weui-cell__bd">关闭未读留言提醒</div>
+                <div class="weui-cell__ft">
+{#                    <input class="weui-switch" type="checkbox" checked="checked">#}
+                    {% if my.remind_unread_close == '1' %}
+                        <input class="weui-switch" type="checkbox" id="unread_remind"  checked="checked">
+                    {% else %}
+                        <input class="weui-switch" type="checkbox" id="unread_remind" >
 
+                    {% endif %}
 
+                </div>
+    </div>
+    <div class="weui-cell weui-cell_switch">
+                <div class="weui-cell__bd">关闭每天九点聊天提醒</div>
+                <div class="weui-cell__ft">
+                    {% if my.remind_day_close == '1' %}
+                    <input class="weui-switch" type="checkbox" id="remind" checked="checked">
+                    {% else %}
+                    <input class="weui-switch" type="checkbox" id="remind" >
+                    {% endif %}
+                </div>
+    </div>
+</div>
+
+    <div></div>
+
+<div class="weui-cells">
+        <a class="weui-cell weui-cell_access" href="{{ url_site }}message/1">
+            <div class="weui-cell__bd">
+                <p>求助与建议，请留言</p>
+            </div>
+            <div class="weui-cell__ft"> </div>
+        </a>
+
+</div>
+
+    <br>
+    <br>
+{#<div class="page__bd page__bd_spacing">#}
+{##}
+{#    <a href="javascript:;" class="weui-btn weui-btn_primary" STYLE="margin-left: 20px;margin-right: 20px">退出</a>#}
+{#</div>#}
 
    <div class="weui-tabbar">
         <a href="{{ url_site }}" class="weui-tabbar__item">
@@ -215,19 +189,17 @@
                 <img src="{{ url_site }}media/icon/icons8-Comments Filled.png" alt="" class="weui-tabbar__icon">
                 {% if unreadSum != 0 %}
                 <span class="weui-badge" style="position: absolute;top: -2px;right: -13px;">{{ unreadSum }}</span>
-                {% endif %}
-            </span>
+                {% endif %}            </span>
             <p class="weui-tabbar__label">留言</p>
 
         </a>
-        <a href="{{ url_site }}my/" class="weui-tabbar__item">
+        <a href="{{ url_site }}my/" class="weui-tabbar__item weui-bar__item_on">
             <img src="{{ url_site }}media/icon/icons8-User.png" alt="" class="weui-tabbar__icon">
             <p class="weui-tabbar__label">我的</p>
         </a>
 
     </div>
 
-{#    <script src="../js/app.js"></script>#}
 
 </body>
 </html>

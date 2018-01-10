@@ -19,7 +19,7 @@
 
 
     <div class="container" id="app">
-      <h3 class="text-center"> 给 <a href="{{ userUrl }}" >{{ name }}</a> 留言</h3>
+      <h3 class="text-center" style="margin-left: 15px;margin-top: 20px"> 给 <a href="{{ userUrl }}" >{{ name }}</a> 留言</h3>
 
 {#        {% for i in msgs %}#}
 {#            <div>发送者名称：{{ i.sid.name }}</div>#}
@@ -77,8 +77,29 @@
                 </div>
                 <div class="weui-cell__bd">
                     <p>{{ i.sid.name }}</p>
-                    <p style="font-size: 13px;color: #888888;">{{ i.content }}</p>
+                    <p>
+                        <!-- 如果是我发的，并且对方未读，这里显示[未读]-->
+                        {% if i.read_not == '0' and i.sid_id == uid %}
+                        <span style="font-size: 11px; color: dodgerblue">[送达] </span>
+                        {% elif i.read_not == '1' and i.sid_id == uid %}
+                        <span style="font-size: 11px; color: limegreen" >[已阅] </span>
+                        {% endif %}
+
+                    {% if i.content == "#sendFlower" %}
+                        {# 自己视角与对方视角不一样 #}
+                        {% if uid == i.sid.id %}
+                             <span style="font-size: 13px;color: #888888;">送出一朵 <img src="{{ img_gift_template.0 }}" height="40px" width="40px"> </span>
+                        {% else %}
+                            <span style="font-size: 13px;color: #888888;">送你一朵 <img src="{{ img_gift_template.0 }}" height="40px" width="40px"> (获得1积分)</span>
+                            {% endif %}
+                        {% elif i.content == "#sendBear" %}
+                        {% else %}
+                        <span style="font-size: 15px;color: #888888;">{{ i.content }}</span>
+                    {% endif  %}
+                    </p>
+
                     <p style="font-size: 13px;color: #888888;">{{ i.s_time }}</p>
+
                 </div>
 {#                <div class="weui-cell__ft">></div>#}
             </div>

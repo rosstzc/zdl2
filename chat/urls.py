@@ -1,7 +1,6 @@
 from django.conf.urls import  url
 from django.conf import settings
 from django.conf.urls.static import static
-
 from chat import views
 from chat import view_weixinservice
 
@@ -21,6 +20,7 @@ urlpatterns = [
     url(r'^user/(?P<uid>.{1,50})/$', views.userProfile),
     url(r'^modify-info/$', views.modifyInfo, name = 'modifyInfo'),
     url(r'^online-user/$', views.onlineUser, name='onlineUser'),
+    url(r'^help-list/$', views.helpList, name='helpList'),
 
     #message
     url(r'^chat-list/$', views.chatList, name='chatList'),
@@ -48,7 +48,6 @@ urlpatterns = [
 
 
     url(r'^test/$', views.test, ),
-    url(r'^test3/$', views.updateFakeUserLoginTime, ),
 
     #message
 

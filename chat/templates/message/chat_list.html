@@ -37,7 +37,24 @@
                     </div>
                     <div class="weui-media-box__bd">
                         <h4 class="weui-media-box__title">{{ i.i.sid.name }}</h4>
-                        <p class="weui-media-box__desc">{{ i.i.content }}</p>
+
+                    <p>
+                        <!-- 如果是我发的，并且对方未读，这里显示[未读]-->
+{#                        <p>{{ i.i.rid_id }},{{ uid }}</p>#}
+                        {% if i.chat.unread > 0 and i.chat.m_type == 's' %}
+                        <span style="font-size: 11px; color: dodgerblue">[送达] </span>
+                        {% elif i.chat.unread == 0 and i.chat.m_type == 's' %}
+                        <span style="font-size: 11px; color: limegreen" >[已阅] </span>
+                        {% endif %}
+
+
+                    {% if i.i.content == "#sendFlower" %}
+                         <span style="font-size: 13px;color: #888888;">送出一朵 <img src="{{ url_site }}media/icon/gift-flower.png" height="40px" width="40px"> </span>
+                    {% elif i.content == "#sendBear" %}
+                    {% else %}
+                        <span style="font-size: 15px;color: #888888;">{{ i.i.content }}</span>
+                    {% endif  %}
+                    </p>
                         <p class="weui-media-box__desc">{{ i.i.time }}</p>
                     </div>
                         <div class="weui-cell__ft">></div>

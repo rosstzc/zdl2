@@ -63,12 +63,22 @@
          })
     </script>
 
+        <style type="text/css">
+        .weui-tabbar{
+            position: fixed;
+        }
+        body {background-color: #f8f8f8}
+    </style>
+
 </head>
 
 
 
 
 <body >
+
+<div class="page__bd" style="height: 100%;">
+
 {#    <div class="container" id="app" >#}
 {#          <h3 class="text-center">我的</h3>#}
 {#        <div>用户id：{{ my.id }}</div>#}
@@ -78,6 +88,8 @@
 {#        <div>可用积分：{{ my.score_today }}</div>#}
 {#        <div><a href="{{ url_info }}"> 去我的资料</a></div>#}
 {#    </div>#}
+
+    <div class="weui-cells__title" style="margin-bottom: -10px; font-size: 14px">我的ID：{{ my.id }}</div>
 
     <div class="weui-panel weui-panel_access">
 {#            <div class="weui-panel__hd">图文组合列表</div>#}
@@ -93,8 +105,15 @@
                     <div class="weui-cell__ft">></div>
 
                 </a>
+                <a class="weui-cell weui-cell_access" href="{{ url_site }}modify-info/">
+                    <div class="weui-cell__bd">
+                        <p>去完善资料</p>
+                    </div>
+                    <div class="weui-cell__ft"></div>
+                </a>
 
             </div>
+
 
     </div>
 
@@ -103,7 +122,7 @@
 <div class="weui-cells">
         <a class="weui-cell weui-cell_access" href="{{ url_daqi }}">
             <div class="weui-cell__bd">
-                <p>邀请朋友打气获得积分</p>
+                <p>请朋友打气，送积分 <i class="weui-icon-success"></i></p>
             </div>
             <div class="weui-cell__ft"></div>
         </a>
@@ -150,6 +169,23 @@
     </div>
 </div>
 
+    <div></div>
+
+<div class="weui-cells">
+            <a class="weui-cell weui-cell_access" href="{{ url_site }}message/1">
+            <div class="weui-cell__bd">
+                <p>新手引导 </p>
+            </div>
+            <div class="weui-cell__ft"> </div>
+        </a>
+        <a class="weui-cell weui-cell_access" href="{{ url_site }}message/1">
+            <div class="weui-cell__bd">
+                <p>求助与建议，请留言</p>
+            </div>
+            <div class="weui-cell__ft"> </div>
+        </a>
+
+</div>
 
     <br>
     <br>
@@ -178,8 +214,10 @@
         </a>
 
     </div>
+    <br>
+    <br>
 
-
+</div>
 </body>
 </html>
 

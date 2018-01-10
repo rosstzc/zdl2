@@ -72,17 +72,20 @@
             if (ageValue === 1) {
                 agePicker.text('18~25')
             }
-            if (ageValue === 2) {
+            else if (ageValue === 2) {
                 agePicker.text('25~32')
             }
-            if (ageValue === 3) {
+            else if (ageValue === 3) {
                 agePicker.text('33~40')
             }
-            if (ageValue === 4) {
+            else if (ageValue === 4) {
                 agePicker.text('40~50')
             }
-            if (ageValue === 5) {
+            else if (ageValue === 5) {
                 agePicker.text('50+')
+            }
+            else {
+                agePicker.text('-')
             }
 
 
@@ -337,7 +340,6 @@
 
 
 
-
             //刷新相册
 			$('.js_file').on('change', function(event) {
 				var files = event.target.files;
@@ -471,6 +473,16 @@
 
             });
 
+            //给未填写的资料，标记为红色
+            $input = $(".weui-input");
+            $input.each(function () {
+                var value = $(this).val();
+                if (value === '') {
+                    $label = $(this).parent().parent().children().children('label');
+                    $label.css("color","red");
+                }
+            });
+
 
 		});
 
@@ -561,16 +573,16 @@
 {#        <input class="weui-input" type="hidden"  value=" " name="base64" id="base64" placeholder=""/>#}
         <input class="weui-input" type="hidden"  value="x" name="delete_img" id="delete_img" placeholder=""/>
 
-        <div class="weui-cells__title">资料</div>
+        <div class="weui-cells__title">基本资料</div>
         <div class="weui-cells weui-cells_form">
             <div class="weui-cell">
-                <div class="weui-cell__hd"><label class="weui-label" >呢称</label></div>
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">呢称</label></div>
                 <div class="weui-cell__bd">
                     <input class="weui-input" type="text"  value="{{ my.name }}" name="name"  placeholder="请输入呢称"/>
                 </div>
             </div>
             <div class="weui-cell">
-                <div class="weui-cell__hd"><label class="weui-label">性别</label></div>
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">性别</label></div>
                 <div class="weui-cell__bd">
                     <input  class="weui-input" type="hidden" value="{{ my.sex }}"  name="sexInput" id="sexInput" placeholder=""/>
                     <a href="javascript:;" class="weui-btn weui-btn_default" id="showPicker">性别</a>
@@ -579,48 +591,130 @@
                 </div>
             </div>
             <div class="weui-cell">
-                <div class="weui-cell__hd"><label class="weui-label">年龄段</label></div>
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">年龄</label></div>
                 <div class="weui-cell__bd">
                     <input class="weui-input" type="hidden" value="{{ my.age }}" name="ageInput" id="ageInput" placeholder=""/>
-                    <a href="javascript:;" class="weui-btn weui-btn_default" id="agePicker">年龄段</a>
+                    <a href="javascript:;" class="weui-btn weui-btn_default" id="agePicker">年龄</a>
 
                 </div>
             </div>
             <div class="weui-cell">
-                <div class="weui-cell__hd"><label class="weui-label">星座</label></div>
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">星座</label></div>
                 <div class="weui-cell__bd">
                     <input class="weui-input" type="text"  value="{{ my.xingzuo }}" name="xingzuo" placeholder="请输入星座"/>
                 </div>
             </div>
             <div class="weui-cell">
-                <div class="weui-cell__hd"><label class="weui-label">城市</label></div>
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">所在城市</label></div>
                 <div class="weui-cell__bd">
                     <input class="weui-input" type="text"  value="{{ my.city }}" name="city" placeholder="请输入所在城市"/>
                 </div>
             </div>
+
+        </div>
+
+
+        <div class="weui-cells__title">个人信息</div>
+        <div class="weui-cells weui-cells_form">
             <div class="weui-cell">
-                <div class="weui-cell__hd"><label class="weui-label">行业</label></div>
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">行业</label></div>
                 <div class="weui-cell__bd">
-                    <input class="weui-input" type="text"  value="{{ my.industry }}" name="industry" placeholder="请输入所在行业"/>
+                    <input class="weui-input" type="text"  value="{{ my.industry }}" name="industry"  placeholder="请输入所在行业,比如IT/互联网/通信"/>
+                </div>
+            </div>
+
+
+
+
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">职责</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text"  value="{{ info.job }}" name="job"  placeholder="请输入职责信息，如互联网产品运营"/>
+
                 </div>
             </div>
             <div class="weui-cell">
-                <div class="weui-cell__hd"><label class="weui-label">个性签名</label></div>
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">公司</label></div>
                 <div class="weui-cell__bd">
-                    <input class="weui-input" type="text"  value="{{ my.introduction }}" name="introduction" placeholder="请输入个人介绍"/>
+                    <input class="weui-input" type="text"  value="{{ info.company }}" name="company"  placeholder="请输入公司信息，如腾讯/百度"/>
+
+                </div>
+            </div>
+
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">家乡</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text"  value="{{ info.hometown }}" name="hometown" placeholder="请输入家乡信息，如湖南长沙"/>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">经常出没</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text"  value="{{ info.place }}" name="place" placeholder="请输入经常去的地方，如北京国图、香港旺角"/>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">个性签字</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text"  value="{{ my.introduction }}" name="introduction" placeholder="请输入个性特点描述"/>
                 </div>
             </div>
         </div>
+
+        <div class="weui-cells__title">我的兴趣</div>
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">运动</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text"  value="{{ info.sport }}" name="sport"  placeholder="请输入爱好运动，如篮球、羽毛球"/>
+                </div>
+            </div>
+
+
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">音乐</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text"  value="{{ info.music }}" name="music" placeholder="请输入爱好音乐，如流行曲、blue、交响乐"/>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">食物</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text"  value="{{ info.food }}" name="food" placeholder="请输入爱好食物，如日本料理、香港茶餐厅、北京烤鸭"/>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">电影</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text"  value="{{ info.movie }}" name="movie" placeholder="请输入喜爱电影，如爱的约会、阿甘正传"/>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">书或动漫</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text"  value="{{ info.book }}" name="book" placeholder="请输入喜爱书籍或动漫，如韩寒、三毛"/>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label" style="color: #888888">我的足迹</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="text"  value="{{ info.foot }}" name="foot" placeholder="请输入你的足迹，如巴厘岛、韩国、香港"/>
+                </div>
+            </div>
+        </div>
+
+        <br>
 
 
         <div class="weui-btn-area">
-            <input type="submit" value="确定" class="weui-btn weui-btn_primary">
+            <input type="submit" value="保存" class="weui-btn weui-btn_primary">
 {#            <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips" type="sumit">确定</a>#}
         </div>
+            <br>
+            <br>
     </div>
 
 </form>
-
 
     <div id="dialogs">
         <!--BEGIN dialog1-->

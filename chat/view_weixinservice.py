@@ -22,8 +22,7 @@ from django.db.models import Q
 
 from view_func import *    #公共方法
 import  hashlib
-
-
+import re
 
 # from  view_func import PostMessge,GetSiteUrl, saveMessage,GetTimeNow, score_today
 
@@ -153,8 +152,7 @@ def responseMsg(request):
             user.POSITION = info['city'] + ' ' + info['province']
             user.state = 1
             user.save()
-
-            user = score_today(user) #首次注册获得今日积分
+            user = get_score_today(user)[0] #首次注册获得今日积分
 
 
             #创建plus表
@@ -168,13 +166,14 @@ def responseMsg(request):
 
             #以小秘书名义给用户发一条欢迎私信
             temp = '欢迎到九点聊天，点菜单【配对】就可去聊天，给相册放些照片会更受欢迎。 有疑问请给我留言哦...'
-            saveMessage(request, 1, uid, temp,'0')
+            saveMessage( 1, uid, temp,'0','0', GetTimeNow())
 
             # content = '欢迎到[九点聊天]，点我去完善的个人档案让你更受青睐，用心聊天，开心聊天！'
             content = '欢迎 '+ user.name +' ，点菜单【配对】去聊天 ；点【我的】给相册添加照片.'
             # url = GetSiteUrl(request) + 'modify/' + str(uid) + '/?W_NAME=' + W_NAME
             # replyContent =content + '\n据统计，资料完善的用户更受青睐，请点<a href="' +str(url) + '">完善你的资料</a> 。\n（注：链接是包含隐私信息，切勿转发给TA人）'
             # return getReplyXml(msg,replyContent)
+
 
             url = GetSiteUrl(request) + 'my/' + '?W_NAME=' + user.W_NAME
             temp =  GetImageTextXML2(msg,
@@ -189,6 +188,9 @@ def responseMsg(request):
                                      '',
                                      str(url),#不是为啥，这里不识别，必须先转换string
             )
+
+
+            # getReplyXml(msg, content)
             return temp
 
 
@@ -200,8 +202,8 @@ def responseMsg(request):
             # replyContent = replyContent + unread
 
             #以小秘书名义给用户发一条欢迎私信
-            temp = '感谢你再次关注我们，如有问题建议可加客服微信：yingyumishu ；另外，聊天请注意文明用语哦'
-            saveMessage(request, 1, user.id, temp,'0')
+            temp = '你一定在想念我们，如对产品有建议请直接回复我；另外，聊天请注意文明用语哦'
+            saveMessage( 1, user.id, temp,'0','0',GetTimeNow())
 
             # url = 'http://' + get_current_site(request).domain + '/register/' + W_NAME +'/'
             # replyContent = '欢迎进入24小时英语角，随时找人练口语、结伴学英语。点链接<a href="' +str(url) + '">花10秒完善资料后进入英语角！</a>   （注：链接是你进入英语角凭证，切勿转发给TA人）'
@@ -308,6 +310,24 @@ def responseMsg(request):
         #我向微信发信息
         if eventMsg != 'CLICK':
 
+            #针对对管理员特殊文本识别，替机器人回复
+            if user.id == 817:
+                if msgType == 'text':
+                    # msgContent = 'dfasdfa @@123'
+                    if '@@' in msgContent:
+                        id = re.findall(r"@@(.+$)", msgContent)
+                        id = int(id[0])
+                        msgContent = re.sub(r"@@.*$", "", msgContent)
+                        if id == '' or id == None:
+                            resMsg = '没有找到相应广告机器人id'
+                            return getReplyXml(msg, resMsg)
+                        else:
+                            user = User.objects.get(id=id)  # 机器人用户
+                    # str = "a123b"
+                    # print re.findall(r"a(.+?)b", str)  #
+                    # 输出['123']
+
+
             #下面没有用的，因为自定义菜单默认post一个信息到weixinservice
             if eventMsg == 'VIEW':
                 print('view menu')
@@ -331,14 +351,28 @@ def responseMsg(request):
                 resMsg = '【系统消息】你在自动配对中，系统正在为你匹配到聊天朋友，请留意消息通知。有问题或建议，请加客服微信号:yingyumishu （英语秘书的拼音）'
                 return getReplyXml(msg,resMsg)
 
+
+
             #在对话状态，我给微信发信息就是给对方发信息
             if user.state == '3':
                 chat = Chat.objects.select_related().filter(Q(rid=user.id) | Q(sid=user.id), close='0')
                 chat = chat[0]
-                if user.id == chat.rid_id :
+                if user.id == chat.rid_id :  #找到对方
                     user_chat = chat.sid
                 else:
                     user_chat = chat.rid
+
+                #这里统一刷新chat表 time_end的时间
+                chat.time_end = GetTimeNow()
+                chat.save()
+
+                #如果被配对的用户是机器人，就要转到我的手机上
+                adMode = '0'
+                adminUserWname = ''
+                textAdd = ' from-' + str(user.id) + '-to-' + str(user_chat.id)
+                if (user_chat.id in adUser('0')) or (user_chat.id in adUser('1')):
+                    adMode = '1'
+                    adminUserWname = 'oe6opwMK08ZI1VzQ4T5ahhO18TGQ'  #
 
 
                 #不同类型的信息处理不一样，若非文本，在message不保存记录
@@ -349,14 +383,27 @@ def responseMsg(request):
                     resMsg = PostFormat(resMsg)
                     # 触发一个post文本给B
                     PostMessge(token, str(PostText(user_chat.W_NAME, resMsg)))
+
+                    #发给机器人的信息转给我
+                    if adMode == '1':
+                        resMsg = resMsg + textAdd
+                        PostMessge(token, str(PostText(adminUserWname, resMsg)))
+
                     #本地写信息
                     if msgContent != '':
-                        saveMessage(request, user.id, user_chat.id, msgContent, '1')
+                        saveMessage(user.id, user_chat.id, msgContent, '1','0',GetTimeNow())
                         return ''
 
                 if msgType == 'image':
                     PostMessge(token, str(PostImg(user_chat.W_NAME, MEDIA_ID)))
                     # saveMessage(request, user.id, user_chat.id, '[图片]','1')
+
+                    # 发给机器人的信息转给我
+                    if adMode == '1':
+                        PostMessge(token, str(PostImg(adminUserWname, MEDIA_ID)))
+                        resMsg = '图片' + textAdd
+                        PostMessge(token, str(PostText(adminUserWname, resMsg)))
+
                     return ''
 
                 if msgType == 'voice':
@@ -370,13 +417,13 @@ def responseMsg(request):
                     print New_Media_ID
                     # 把该mid Post给用户
                     PostMessge(token, PostVocie(user_chat.W_NAME, New_Media_ID))
-                    # message = Message()
-                    # message.s_uid_id = uid
-                    # message.r_uid = userB_id
-                    # message.content = MEDIA_ID
-                    # message.cal = 1
-                    # message.s_time = GetTimeNow()
-                    # message.save()
+
+                    # 发给机器人的信息转给我
+                    if adMode == '1':
+                        PostMessge(token, PostVocie(adminUserWname, New_Media_ID))
+                        resMsg = '语音' + textAdd
+                        PostMessge(token, str(PostText(adminUserWname, resMsg)))
+
                     return ''
 
                 if msgType == 'video':
@@ -406,11 +453,11 @@ def responseMsg(request):
                     u2 = ''
                     p2 = ''
                     PostMessge(token, str(PostTexImg(t1, d1, u1, p1, t2, d2, u2, p2, user_chat.W_NAME)))
-
+                    return ''
                 #需要给腾讯服务器返回一个空文本
-                return ''
-
-
+                # else:
+                #     resMsg = ' 暂不支持该信息类型，请发文字、语音、图片'
+                #     return getReplyXml(msg,resMsg)
 
 
 

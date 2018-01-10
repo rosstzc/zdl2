@@ -76,7 +76,6 @@
                 $iosDialogLeave.on('click', '.weui-dialog__btn_primary', function(){
                     $iosDialogLeave.fadeOut(200);
                     location.href="{{ url_leave }}";
-
                 });
 {#                    alert('333');#}
                 return false
@@ -118,6 +117,79 @@
             });
 
 
+            //提醒获取推荐用户
+            $iosDialog3 = $("#iosDialog3");
+            $('#checkIn').click(function () {
+                $iosDialog3.fadeIn(200);
+            });
+            $("#iKnow").click(function () {
+                $iosDialog3.fadeOut(200);
+                url = '{{ url_site }}';
+                setTimeout("window.location.href=url",10);
+
+            });
+
+
+            //addMore
+            addMore = $('#addMore');
+            $toast = $('#toast');
+            scoreSum = $('#scoreSum');
+            iosDialog4 = $('#iosDialog4');
+            addMore.click(function () {
+                if (parseInt(scoreSum.text()) === 0){
+                    iosDialog4.fadeIn(200);
+                }
+                else {
+                    score = $('#scoreAvaiable');
+                    score.text(parseInt(scoreSum.text() - 1)); //toast显示可用积分
+                    if ($toast.css('display') != 'none') return;
+                    $toast.fadeIn(100);
+                    setTimeout(function () {
+                        $toast.fadeOut(100);
+                        }, 1000
+                    );
+                    url = '{{ url_site }}' + '?action=addMore';
+                    setTimeout("window.location.href=url",1000);
+                }
+            });
+            $('#leave2').click(function () {
+                iosDialog4.fadeOut(200);
+            });
+
+
+
+            //检查自己资料是否完整
+            userRecommend = $('.user-recommend');
+            userRecommend.bind('click',function () {
+{#                url = '{{ url_site }}' + 'my?action=infoCheck';#}
+                url = $(this).attr('href');  //目标用户页面
+                url_check = url + '&check=check';
+{#                alert(url_check);#}
+{#                url2 = $(this).attr('href');  //目标用户页面#}
+                $.get(url_check, function (data,status) {
+                    //资料完整
+                    if(data === '1'){
+                        setTimeout("window.location.href=url",10);
+                    }
+                    else{ //不完整
+                        $('#infoNotText').text(data);
+                        $iosDialog5 = $("#iosDialog5");
+                       $iosDialog5.fadeIn(200);
+                       //异步访问一次目标用户，实践就是刷新recommend表
+{#                        $.get(url2, function (data,status) {#}
+{#                            //不用处理返回#}
+{#                        });#}
+                    }
+                }) ;
+                return false;//不a标签让自动跳转
+            });
+
+
+
+            $('#goModifyInfo').click(function () {
+                url = '{{ url_site }}' + 'modify-info/';
+                setTimeout("window.location.href=url",10);
+            })
 
 
         })
@@ -150,18 +222,27 @@
 
     {% if state == '1' %}   {# 空闲中 #}
         <div class="button-sp-area">
-        <div align="center">
-            <img src="{{  url_site }}media/icon/icons8_2100.png" alt=""  class="" style="padding-top: 50px;padding-bottom: 40px" >
-        </div>
-        {% if my.sex == '1' %}
-        <div ><a href="javascript:;"  class="weui-btn weui-btn_plain-primary" style="width: 200px" id="goMatch" >快速匹配</a>  </div>
-        {% else %}
-            <div  >
-                <div><a href="javascript:;"  class="weui-btn weui-btn_plain-primary" style="width: 150px" id="goMatch" >快速匹配</a>  </div>
-{#                <div style="float: right;"><a href="javascript:;"  class="weui-btn weui-btn_plain-primary" style="width: 150px" id="goMatch" >快速匹配</a>  </div>#}
+            <div align="center">
+                <img src="{{  url_site }}media/icon/icons8_2100.png" alt=""  class="" style="padding-top: 30px;padding-bottom: 10px" >
             </div>
-        {% endif %}
+    {#        {% if my.sex == '1' %}#}
+    {#        <div >#}
+    {#            <a href="javascript:;"  class="weui-btn weui-btn_plain-primary" style="width: 200px" id="goMatch" >快速匹配</a> #}
+    {#        </div>#}
+    {#        {% else %}#}
+    {#            <div  >#}
+    {#                <div><a href="javascript:;"  class="weui-btn weui-btn_plain-primary" style="width: 150px" id="goMatch" >快速匹配</a>  </div>#}
+    {#                <div style="float: right;"><a href="javascript:;"  class="weui-btn weui-btn_plain-primary" style="width: 150px" id="goMatch" >快速匹配</a>  </div>#}
+    {#            </div>#}
+    {#        {% endif %}#}
+            {% if key_re == '0' %}
+            <div>
+            <a href="javascript:;"  class="weui-btn weui-btn_plain-primary" style="width: 200px" id="checkIn" > 主人，请签到</a>
+            </div>
+            {% endif %}
+
         </div>
+
 
     {% elif state == '2' %}  {# 匹配中 #}
         <div class="weui-msg">
@@ -214,24 +295,31 @@
 
         <div align="left" style="padding-left: 7px; padding-top: 10px;">
             <a href="{{ url_site }}score-desc">
-          <div  class="weui-cells__title" >可用积分:{{ score_available }}，赚积分</div>
+          <div  class="weui-cells__title" >
+              {% if scoreText != '' %}
+                  <span style="color: darkred">{{ scoreText }}</span>
+              {% else %}
+              可用积分:<span id="scoreSum">{{ score_available }}</span>，<span style="color: cornflowerblue">赚积分</span>
+              {% endif %}
+          </div>
                 </a>
         </div>
 
-{% if state == '1' %}
-    <div class="weui-cells weui-cells_checkbox" id="match_type">
-        <label class="weui-cell weui-check__label" for="s11">
-            <div class="weui-cell__hd">
-                <input type="checkbox" class="weui-check" name="checkbox1" id="s11" checked="checked" >
+
+{#{% if state == '1' %}#}
+{#    <div class="weui-cells weui-cells_checkbox" id="match_type">#}
+{#        <label class="weui-cell weui-check__label" for="s11">#}
+{#            <div class="weui-cell__hd">#}
+{#                <input type="checkbox" class="weui-check" name="checkbox1" id="s11" checked="checked" >#}
 {#                <input type="checkbox" class="weui-check" name="checkbox1" id="s11" >#}
-                <i class="weui-icon-checked" ></i>
-            </div>
-            <div class="weui-cell__bd">
-                <p>匹配异性</p>
-            </div>
-        </label>
-    </div>
-{% endif %}
+{#                <i class="weui-icon-checked" ></i>#}
+{#            </div>#}
+{#            <div class="weui-cell__bd">#}
+{#                <p>匹配异性</p>#}
+{#            </div>#}
+{#        </label>#}
+{#    </div>#}
+{#{% endif %}#}
 
 
 {#{% if user_active != 0 and state == '1' or state == '2'%}#}
@@ -245,24 +333,59 @@
 {#    </a>#}
 {#{% endif %}#}
 
-{% if user_active != '0' and state == '1' and user_active.count > 5 %}
-<div class="weui-cells weui-cells_form">
-    <a href="{{ url_site }}active-list/">
-        <div class="weui-cell">
-            <div class="weui-cell__bd" >
-                <div class="weui-uploader__bd" >
-                    <ul class="weui-uploader__files" id="uploaderFiles" >
-                        {% for i in user_active %}
-                        <li  class="weui-uploader__file"  style="background-image:url({{ i.image_url }})"></li>
-                        {% endfor %}
-                    </ul>
-                </div>
+    <!-- 活跃用户 -->
+{#    {% if user_active != '0' and state == '1' and user_active.count > 5 %}#}
+{#    <div class="weui-cells weui-cells_form">#}
+{#        <a href="{{ url_site }}active-list/">#}
+{#            <div class="weui-cell">#}
+{#                <div class="weui-cell__bd" >#}
+{#                    <div class="weui-uploader__bd" >#}
+{#                        <ul class="weui-uploader__files" id="uploaderFiles" >#}
+{#                            {% for i in user_active %}#}
+{#                            <li  class="weui-uploader__file"  style="background-image:url({{ i.image_url }})"></li>#}
+{#                            {% endfor %}#}
+{#                        </ul>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        </a>#}
+{#    </div>#}
+{#    {% endif %}#}
+
+
+<!-- 今天推荐的用户-->
+    {% if  user_re.count > 0 and my.state != '3' and key_re == '1'%}
+        <div class="weui-panel weui-panel_access">
+            <div class="weui-panel__hd"> 今天推荐
+{#                <a href="/?action=addMore"><div style="float: right;color: cornflowerblue">再来1个</div></a>#}
+                <div style="float: right;color: cornflowerblue" id="addMore">再来1个</div>
+            </div>
+            <div class="weui-panel__bd">
+            {% for i in user_re %}
+                <a href="{{ url_site }}user/{{ i.rid.id }}/?action=recommend" class="weui-media-box weui-media-box_appmsg user-recommend">
+                    <div class="weui-media-box__hd" style="position: relative;margin-right: 10px;">
+                        <img  src="{{ i.rid.image_url }}" style="width: 58px;height: 58px;display: block">
+                    </div>
+                    <div class="weui-media-box__bd">
+                        <h4 class="weui-media-box__title">{{ i.rid.name }}</h4>
+{#                    <span ="sex"></span><span> </span><span id="age"></span>#}
+                        <p class="weui-media-box__desc">{{ i.rid.introduction }}</p>
+{#                        <p class="weui-media-box__desc">{{ i.i.time }}</p>#}
+                    </div>
+                    <!-- 如果是自己时女性，可以宠幸这个男生-->
+                    {% if my.sex == '0' %}
+                        <div class="weui-cell__ft">宠幸他 ></div>
+                    {% else %}
+                        <div class="weui-cell__ft">送花 ></div>
+                    {% endif %}
+                </a>
+            {% endfor %}
             </div>
         </div>
-    </a>
-</div>
-{% endif %}
+    {% endif %}
 
+<br>
+<br>
 
 {##}
 {#<div class="weui-tab">#}
@@ -313,7 +436,7 @@
     </div>
 
     <div id="dialogs">
-        <!--BEGIN dialog1-->
+        <!--BEGIN dialog2-->
         <div class="js_dialog" id="iosDialogLeave" style="display: none;">
             <div class="weui-mask"></div>
             <div class="weui-dialog">
@@ -338,7 +461,67 @@
             </div>
         </div>
 
+        <!--BEGIN dialog3-->
+        <div class="js_dialog" id="iosDialog3" style="display: none;">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__bd">
+                    {% if my.sex == '0' %}
+                    女皇好，今天推荐已为你准备，请看看要宠幸谁 ：》
+                    {% else %}
+                    大王好，今天女神推荐已为你正准备好，请看看要给谁送花 ：》
+                    {% endif %}
+                </div>
+                <div class="weui-dialog__ft">
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary" id="iKnow">知道了,退下吧</a>
+                </div>
+            </div>
+        </div>
 
+    <!--BEGIN toast-->
+    <div id="toast" style="display: none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-icon-success-no-circle weui-icon_toast"></i>
+
+            <p class="weui-toast__content">
+                消耗1积分
+                <br>
+                (可用积分:<span id="scoreAvaiable">1</span>）
+            </p>
+        </div>
+    </div>
+    <!--end toast-->
+
+
+
+        <!--BEGIN dialog4 积分用完-->
+        <div class="js_dialog" id="iosDialog4" style="display: none;">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__bd">积分用完了!<br>可邀请朋友"打气"获得积分</div>
+                <div class="weui-dialog__ft">
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_default" id="leave2">取消</a>
+                    <a href="{{ url_daqi }}" class="weui-dialog__btn weui-dialog__btn_primary" id="">去邀请</a>
+                </div>
+            </div>
+        </div>
+
+
+        <!--BEGIN dialog5 提示去完成资料-->
+        <div class="js_dialog" id="iosDialog5" style="display: none;">
+            <div class="weui-mask"></div>
+            <div class="weui-dialog">
+                <div class="weui-dialog__hd"><strong class="weui-dialog__title">请完善你的资料！</strong></div>
+                <div class="weui-dialog__bd">
+                    <br>
+                    <span id ='infoNotText'>XXX</span></div>
+                <div class="weui-dialog__ft">
+{#                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary" id="leave3"></a>#}
+                    <a href="javascript:;" class="weui-dialog__btn weui-dialog__btn_primary" id="goModifyInfo">知道，去完善</a>
+                </div>
+            </div>
+        </div>
 <br>
 <br>
 

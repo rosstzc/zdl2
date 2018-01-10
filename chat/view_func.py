@@ -38,22 +38,36 @@ def GetAccessToken():
     return token
 
 
-def score_today(my):
-    my.time_login_today = GetTimeNow()
-    my.remind_key = "0"
-    my.score_today = '15'
-    if my.sex == '0':
-        my.score_today = '30'
-    my.save()
-    return my
+
+def adUser(sex):
+    adUserManId = []
+    adUserWonmanId = []
+
+    user= User.objects.filter(user_type='ad')
+    man = user.filter(sex='1')
+    woman = user.filter(sex='0')
+
+    for i in man:
+        adUserManId.append(i.id)
+    for i in woman:
+        adUserWonmanId.append(i.id)
+
+    if sex == '0':
+        return adUserWonmanId
+    if sex == '1':
+        return adUserManId
+
+
+
 
 #保存信息
-def saveMessage(req, sid, rid, msg, read_not):
+def saveMessage(sid, rid, msg, read_not,type, time):
     message = Message(sid_id=sid,
                       rid_id=rid,
                       content=msg,
-                      s_time=GetTimeNow(),
-                      read_not=read_not)
+                      read_not=read_not,
+                      type=type,
+                      s_time=time)
     message.save()
 
    #统计对方未读信息
@@ -65,12 +79,26 @@ def saveMessage(req, sid, rid, msg, read_not):
     if result.count() >= 1:
         result.delete()
 
-    chat = ChatList(sid_id=sid, rid_id=rid, unread=unread, content=msg, time=GetTimeNow())
-    chat.save()
+    chatlist = ChatList(sid_id=sid, rid_id=rid, m_type='s',unread=unread, content=msg, time=GetTimeNow())
+    chatlist.save()
     #反过来再插入一条
-    chat = ChatList(sid_id=rid, rid_id=sid, content=msg, time=GetTimeNow())
-    chat.save()
+    chatlist = ChatList(sid_id=rid, rid_id=sid, m_type='r',content=msg, time=GetTimeNow())
+    chatlist.save()
 
+
+
+
+#每天赠送积分
+def get_score_today(my):
+    my.time_login_today = GetTimeNow()
+    my.remind_key = "0"
+    my.score_today = '30'
+    if my.sex == '0':
+        my.score_today = '20'
+    my.save()
+    text = '今天第一次登录，获得赠送 ' + my.score_today + ' 积分'
+    temp = [my,text]
+    return temp
 
 def GetSiteUrl(req):
     url = get_current_site(req)
@@ -141,6 +169,12 @@ def UserDefaultImg(req, img):
         img = 'http://' + url.domain + '/static/img/erweima.jpg'
     return img
 
+def OnlineTimeMin(mins):
+    now = datetime.datetime.now()
+    start = now - datetime.timedelta(minutes=mins)
+    DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+    start = start.strftime(DATETIME_FORMAT) #转发为unicode的格式，与数据库存储一致
+    return start
 
 def OnlineTime(hour):
     if not hour:

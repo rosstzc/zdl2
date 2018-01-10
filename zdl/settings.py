@@ -64,7 +64,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'chat',
     'django_crontab', #定时任务
-
 ]
 
 #定时任务
@@ -78,16 +77,22 @@ CRONJOBS = [
     # ('*/1 * * * *', 'chat.cron.test'),
 
 
-    ('0 21 * * *', 'chat.cron.unreadNote'),   #给又未读信息的人提醒
-    # ('1 21 * * *', 'chat.cron.unreadNote'),   #给又未读信息的人提醒
+    ('1 21 * * *', 'chat.cron.unreadNoteForWoman'),    #9：00分，给女性用户提醒
+    ('2 21 * * *', 'chat.cron.unreadNoteForWoman'),    #9：00分，给女性用户提醒
+    # ('3 21 * * *', 'chat.cron.unreadNoteForWoman'),    #9：00分，给女性用户提醒
+
+    ('30 20 * * *', 'chat.cron.unreadNoteForMan'),   #8：30分，给男性用户提醒
+    ('31 20 * * *', 'chat.cron.unreadNoteForMan'),   #8：30分，给男性用户提醒
+    # ('32 20 * * *', 'chat.cron.unreadNoteForMan'),   #8：30分，给男性用户提醒
     # ('2 21 * * *', 'chat.cron.unreadNote'),   #给又未读信息的人提醒
 
-    ('1 21 * * *', 'chat.cron.chatNote'),   #给没有未读的人发每天提醒
-    ('2 21 * * *', 'chat.cron.chatNote'),   #给没有未读的人发每天提醒
     ('3 21 * * *', 'chat.cron.chatNote'),   #给没有未读的人发每天提醒
+    ('4 21 * * *', 'chat.cron.chatNote'),   #给没有未读的人发每天提醒
+
+    ('1 2 * * *', 'chat.cron.creatPushFlowerRecord'),   #晚上2点执行一次，给用户推送花记录（广告用）
     #
     ('1 */1 * * *', 'chat.cron.serviceNote'),   #每小时一次
-    ('*/1 * * * *', 'chat.cron.minCheck'),  #每分钟check1次
+    ('*/1 * * * *', 'chat.cron.minCheck'),  #每分钟执行一次
 
 ]
 
