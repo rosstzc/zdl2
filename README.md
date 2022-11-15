@@ -3,9 +3,9 @@
 [English Version](https://github.com/rosstzc/zdl2/blob/master/README.md)
 
 # zdl2
-a chat app base on the Wechat..
+A Chat App Base on the WeChat Official Accounts
 
-# **Chatting at 9 clock**
+# A Chat App based on The Official A
 
 ## **Project Introduction**
 
