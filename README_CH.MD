@@ -41,19 +41,24 @@
 
 <img src="https://user-images.githubusercontent.com/5052733/201883426-46086c2e-d28d-4070-83fe-d6076f66ce1b.png" width="300px">
 
-![2017-11-18 160225](https://user-images.githubusercontent.com/5052733/201883426-46086c2e-d28d-4070-83fe-d6076f66ce1b.png)
-![2018-01-09 104853](https://user-images.githubusercontent.com/5052733/201883445-772329f2-e62a-46b9-a238-683da537aec0.png)
-
-下图展示用户的资料信息，图中绿色按钮表示用户处于在线状态，可以给他发起聊天
-![2018-01-09 104912](https://user-images.githubusercontent.com/5052733/201890832-7908c4d2-5acf-4825-89e2-6c281116a3b8.png)
-![2018-01-09 104920](https://user-images.githubusercontent.com/5052733/201890848-a815605f-2b12-4ef5-a67d-07752d4303bc.png)
-
-下面展示聊天配对成功后的聊天过程
-![2017-11-18 160213](https://user-images.githubusercontent.com/5052733/201891088-3574e7e9-0b94-4762-8461-a7651e0232d5.png)
-
-![2017-11-18 160112](https://user-images.githubusercontent.com/5052733/201891105-cf1a6d4b-68c7-4667-be65-bbd36786be88.png)
+<img src="https://user-images.githubusercontent.com/5052733/201883445-772329f2-e62a-46b9-a238-683da537aec0.png" width="300px">
 
 
-下图
 
-## 项目一些截图展示：
+下图展示用户的资料信息，图中绿色按钮表示用户处于在线状态，可以给他发起聊天邀请。
+
+<img src="https://user-images.githubusercontent.com/5052733/201890832-7908c4d2-5acf-4825-89e2-6c281116a3b8.png" width="300px">
+
+
+<img src="https://user-images.githubusercontent.com/5052733/201890848-a815605f-2b12-4ef5-a67d-07752d4303bc.png" width="300px">
+
+
+
+下面展示聊天配对成功后的聊天过程。
+
+<img src="https://user-images.githubusercontent.com/5052733/201891088-3574e7e9-0b94-4762-8461-a7651e0232d5.png" width="300px">
+
+<img src="https://user-images.githubusercontent.com/5052733/201891105-cf1a6d4b-68c7-4667-be65-bbd36786be88.png" width="300px">
+
+
+
