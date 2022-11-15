@@ -2,11 +2,11 @@
 
 [English Version](https://github.com/rosstzc/zdl2/blob/master/README.md)
 
-# zdl2
-A Chat App Base on the WeChat Official Accounts
 
-# A Chat App based on The Official A
 
+
+# A Chat App based on The WeChat
+a Chat app base on the WeChat Official Accounts.
 ## **Project Introduction**
 
 This project is a stranger chatting app based on the WeChat platform. Meeting new friends is a common need of our human beings. WeChat is the largest social platform in China. Since the positioning of WeChat is friend, there are almost no entrances for meeting strangers on WeChat. So it was my idea to develop a chat application on WeChat.
