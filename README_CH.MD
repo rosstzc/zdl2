@@ -38,6 +38,9 @@
 ## 项目一些截图展示：
 
 下图是关注公众后进入app的首页，可以随机配对聊天或者邀请在线的用户聊天。
+
+<img src="https://user-images.githubusercontent.com/5052733/201883426-46086c2e-d28d-4070-83fe-d6076f66ce1b.png" width="300px">
+
 ![2017-11-18 160225](https://user-images.githubusercontent.com/5052733/201883426-46086c2e-d28d-4070-83fe-d6076f66ce1b.png)
 ![2018-01-09 104853](https://user-images.githubusercontent.com/5052733/201883445-772329f2-e62a-46b9-a238-683da537aec0.png)
 
