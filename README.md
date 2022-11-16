@@ -35,9 +35,9 @@ Therefore, for similar projects that are based on third-party platforms, it is v
 
 This project is a complete development project that can be deployed online, but the premise is that you must know how to connect to the WeChat public platform. If you want to understand this project, you can download it and view the code detail. If you already have experience with Django, it shouldn't be a problem to run the project locally, and you can try some features.
 
-## 项目一些截图展示：
+## Some screenshots of the project
 
-### 下图是关注公众后进入app的首页，可以随机配对聊天或者邀请在线的用户聊天。
+### The figures below show the home page of the chat app. Users can randomly chat with other users or  invite a user to chat.
 
 <img src="https://user-images.githubusercontent.com/5052733/201883426-46086c2e-d28d-4070-83fe-d6076f66ce1b.png" width="300px">
 
@@ -45,7 +45,7 @@ This project is a complete development project that can be deployed online, but 
 
 
 
-### 下图展示用户的资料信息，图中绿色按钮表示用户处于在线状态，可以给他发起聊天邀请。
+### The figures below show the user profile. The green button in the figure indicates that the user is online and you can invite him to chat.
 
 <img src="https://user-images.githubusercontent.com/5052733/201890832-7908c4d2-5acf-4825-89e2-6c281116a3b8.png" width="300px">
 
@@ -54,7 +54,7 @@ This project is a complete development project that can be deployed online, but 
 
 
 
-### 下面展示聊天配对成功后的聊天过程。
+### The figures below show the process of chat after successful match.
 
 <img src="https://user-images.githubusercontent.com/5052733/201891088-3574e7e9-0b94-4762-8461-a7651e0232d5.png" width="300px">
 
